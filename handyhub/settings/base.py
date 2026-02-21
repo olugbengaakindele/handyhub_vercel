@@ -21,6 +21,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",   # ✅ must be before auth
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -29,7 +30,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # ✅ your custom middleware should be AFTER auth (so request.user exists)
     "users.middleware.UpdateLastSeenMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware"
 ]
 
 ROOT_URLCONF = "handyhub.urls"
@@ -69,7 +69,7 @@ USE_TZ = True
 # Static files
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"   # required for deployment collectstatic
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage" 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 # Media uploads
 MEDIA_ROOT = BASE_DIR / "pictures"
 MEDIA_URL = "/profile_picture/"
