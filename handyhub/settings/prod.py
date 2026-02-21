@@ -7,15 +7,12 @@ from decouple import config
 
 
 load_dotenv()  # this reads the .env file
-DEBUG = False
+DEBUG = True
 
 # For local dev, a fallback key is okay (but best to set env var)
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-unsafe-secret-key")
 
-ALLOWED_HOSTS = os.environ.get(
-    "ALLOWED_HOSTS",
-    "localhost,127.0.0.1"
-).split(",")
+ALLOWED_HOSTS =['https://localtradepro.onrender.com','localtradepro.onrender.com']
 
 # Usually not needed locally unless you're testing https/domains
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if os.environ.get("CSRF_TRUSTED_ORIGINS") else []
