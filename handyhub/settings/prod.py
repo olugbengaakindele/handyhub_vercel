@@ -12,7 +12,7 @@ DEBUG = True
 # For local dev, a fallback key is okay (but best to set env var)
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-unsafe-secret-key")
 
-ALLOWED_HOSTS =['https://localtradepro.onrender.com','localtradepro.onrender.com']
+ALLOWED_HOSTS =['https://handyhub-vercel.onrender.com','handyhub-vercel.onrender.com']
 
 # Usually not needed locally unless you're testing https/domains
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if os.environ.get("CSRF_TRUSTED_ORIGINS") else []
