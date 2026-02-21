@@ -15,8 +15,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-unsafe-secret-key")
 ALLOWED_HOSTS =['https://handyhub-vercel.onrender.com','handyhub-vercel.onrender.com']
 
 # Usually not needed locally unless you're testing https/domains
-CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if os.environ.get("CSRF_TRUSTED_ORIGINS") else []
-
+origins = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in origins.split(",") if o.strip()]
 # ✅ Your current local DB (SQL Server) - keep for now
 
 
