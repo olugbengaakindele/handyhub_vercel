@@ -1,0 +1,158 @@
+{% extends "./base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block body %}
+<div class="min-h-screen bg-slate-100 py-12 px-4">
+
+  <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-10">
+    <div class="flex items-center justify-between mb-6">
+      <a href="{% url 'users:profile' %}"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl
+                bg-emerald-50 text-emerald-700 border border-emerald-200
+                hover:bg-emerald-100 hover:text-emerald-800
+                transition text-sm font-semibold shadow-sm">
+        ← Back to Profile
+      </a>
+    </div>
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <div class="text-5xl mb-3 text-emerald-600">🛠️</div>
+      <h2 class="text-3xl font-extrabold text-slate-800">
+        Manage Your Services
+      </h2>
+      <p class="text-slate-500 mt-2">
+        Add new services or manage existing ones
+      </p>
+    </div>
+
+    <!-- ===================== -->
+    <!-- ADD NEW SERVICES -->
+    <!-- ===================== -->
+    <div class="mb-14">
+      <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <span class="text-emerald-600">➕</span> Add Services
+      </h3>
+
+      <form method="POST" class="space-y-8">
+        {% csrf_token %}
+
+        <!-- Category -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            Service Category
+          </label>
+
+          <select name="category" id="categorySelect"
+                  class="w-full p-3 border border-slate-300 rounded-xl bg-white
+                         focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <option value="">-- Select a Category --</option>
+            {% for category in categories %}
+              <option value="{{ category.id }}">
+                {{ category.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Subcategories -->
+        {% for category in categories %}
+        <div class="subcategory-group hidden"
+             data-category="{{ category.id }}">
+
+          <div class="border border-slate-200 rounded-xl p-6 bg-slate-50">
+            <h4 class="text-lg font-bold text-slate-800 mb-4">
+              {{ category.name }} Services
+            </h4>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {% for sub in category.subcategories.all %}
+              <label
+                class="flex items-center gap-3 p-3 bg-white border border-slate-200
+                       rounded-lg cursor-pointer transition
+                       hover:border-emerald-400 hover:bg-emerald-50">
+
+                <input type="checkbox"
+                       name="services"
+                       value="{{ sub.id }}"
+                       class="h-5 w-5 rounded border-slate-300 text-emerald-600
+                              focus:ring-emerald-500">
+
+                <span class="text-slate-700 font-medium">
+                  {{ sub.name }}
+                </span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+        <button type="submit"
+                class="w-full bg-emerald-600 text-white py-3 rounded-xl
+                       font-semibold shadow-md transition
+                       hover:bg-emerald-700 active:bg-emerald-800">
+          💾 Save Services
+        </button>
+      </form>
+    </div>
+
+    <!-- ===================== -->
+    <!-- EXISTING SERVICES -->
+    <!-- ===================== -->
+    <div>
+      <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <span class="text-emerald-600">🧰</span> Your Current Services
+      </h3>
+
+      {% if user_services %}
+      <div class="space-y-3">
+        {% for service in user_services %}
+        <div
+          class="flex justify-between items-center p-4 bg-slate-50
+                 border border-slate-200 rounded-xl">
+
+          <div>
+            <p class="font-semibold text-slate-800">
+              {{ service.category.name }}
+            </p>
+            <p class="text-sm text-slate-600">
+              {{ service.subcategory.name }}
+            </p>
+          </div>
+
+          <!-- DELETE -->
+          <a href="{% url 'users:delete_user_service' service.id %}"
+            class="flex items-center gap-2 text-red-600 font-semibold
+                    hover:text-red-700 transition">
+            🗑️ Delete
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-slate-500 italic">
+        You haven’t added any services yet.
+      </p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<!-- JS -->
+<script>
+  const categorySelect = document.getElementById("categorySelect");
+  const groups = document.querySelectorAll(".subcategory-group");
+
+  categorySelect.addEventListener("change", function () {
+    groups.forEach(group => {
+      group.classList.add("hidden");
+      if (group.dataset.category === this.value) {
+        group.classList.remove("hidden");
+      }
+    });
+  });
+</script>
+
+{% endblock %}

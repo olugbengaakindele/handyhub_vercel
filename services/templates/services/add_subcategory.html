@@ -1,0 +1,78 @@
+{% extends "users/base.html" %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-100 py-12 px-4">
+    <div class="max-w-xl mx-auto bg-white shadow-lg rounded-2xl p-8">
+
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+            Add Service Subcategory
+        </h2>
+
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Category -->
+            <div>
+                <label class="block mb-2 font-semibold text-gray-700">
+                    Select Category
+                </label>
+                {{ form.category }}
+            </div>
+
+            <!-- Existing Subcategories -->
+            <div id="existing-subcategories"
+                 class="hidden bg-green-50 border border-green-200 rounded-lg p-4">
+                <h4 class="text-sm font-semibold text-green-700 mb-2">
+                    Existing Subcategories
+                </h4>
+                <ul id="subcategory-list" class="text-sm text-gray-700 space-y-1"></ul>
+            </div>
+
+            <!-- Subcategory -->
+            <div>
+                <label class="block mb-2 font-semibold text-gray-700">
+                    Subcategory Name
+                </label>
+                {{ form.name }}
+            </div>
+
+            <button
+                class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold
+                       hover:bg-green-500 transition">
+                Add Subcategory
+            </button>
+        </form>
+
+    </div>
+</div>
+
+<script>
+const categorySelect = document.getElementById("category-select");
+
+categorySelect.addEventListener("change", function () {
+    const categoryId = this.value;
+    const container = document.getElementById("existing-subcategories");
+    const list = document.getElementById("subcategory-list");
+
+    list.innerHTML = "";
+    container.classList.add("hidden");
+
+    if (!categoryId) return;
+
+    fetch("{% url 'services:get_subcategories_by_category' %}?category_id=" + categoryId)
+        .then(response => response.json())
+        .then(data => {
+            if (data.subcategories.length > 0) {
+                container.classList.remove("hidden");
+                data.subcategories.forEach(name => {
+                    const li = document.createElement("li");
+                    li.textContent = "• " + name;
+                    list.appendChild(li);
+                });
+            }
+        })
+        .catch(err => console.error("AJAX error:", err));
+});
+</script>
+
+{% endblock %}

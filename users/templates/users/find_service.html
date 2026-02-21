@@ -1,0 +1,160 @@
+{% extends "./base.html" %}
+{% load static %}
+
+{% block title %}Find a Service | HandymenHub{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-slate-100 py-10">
+  <div class="max-w-6xl mx-auto px-4 space-y-8">
+
+    <!-- Header / Hero -->
+    <section class="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-700 text-white rounded-2xl overflow-hidden shadow-xl">
+      <div class="px-6 md:px-10 py-10 md:py-12">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div>
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Find a Service</h1>
+            <p class="text-white/80 mt-2 max-w-2xl">
+              Choose a category, optional subcategory, and city to find available tradespeople.
+            </p>
+            <p class="text-xs text-white/70 mt-3">
+              Platform only — we don’t verify tradespeople or book services.
+            </p>
+          </div>
+
+          <a href="{% url 'users:index' %}"
+             class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-white/10 border border-white/15
+                    text-sm font-semibold hover:bg-white/15 transition">
+            ← Back to Home
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters Card -->
+    <section class="bg-white rounded-2xl shadow border border-slate-200 p-6 md:p-8">
+      <div class="flex items-center justify-between gap-4 mb-6">
+        <h2 class="text-xl font-extrabold text-slate-900">Search filters</h2>
+
+        {% if selected_category or selected_subcategory or selected_city %}
+          <a href="{% url 'users:find_service' %}"
+             class="text-sm font-semibold text-emerald-700 hover:underline">
+            Reset
+          </a>
+        {% endif %}
+      </div>
+
+      <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <!-- Category -->
+        <div>
+          <label for="categorySelect" class="block text-sm font-semibold text-slate-700 mb-2">Category</label>
+          <div class="relative">
+            <select id="categorySelect" name="category"
+                    class="appearance-none w-full rounded-xl border border-slate-300 bg-white px-4 py-3 pr-10 text-slate-900
+                           focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400">
+              <option value="">All categories</option>
+              {% for cat in categories %}
+                <option value="{{ cat.id }}"
+                        {% if selected_category and selected_category|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>
+                  {{ cat.name }}
+                </option>
+              {% endfor %}
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subcategory -->
+        <div>
+          <label for="subcategorySelect" class="block text-sm font-semibold text-slate-700 mb-2">
+            Subcategory <span class="text-slate-400 font-medium">(optional)</span>
+          </label>
+          <div class="relative">
+            <select id="subcategorySelect" name="subcategory"
+                    class="appearance-none w-full rounded-xl border border-slate-300 bg-white px-4 py-3 pr-10 text-slate-900
+                           focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400">
+              <option value="">All subcategories</option>
+              {% for sub in subcategories %}
+                <option value="{{ sub.id }}"
+                        data-category="{{ sub.category_id }}"
+                        {% if selected_subcategory and selected_subcategory|stringformat:"s" == sub.id|stringformat:"s" %}selected{% endif %}>
+                  {{ sub.name }}
+                </option>
+              {% endfor %}
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- City -->
+        <div>
+          <label for="citySelect" class="block text-sm font-semibold text-slate-700 mb-2">City</label>
+          <div class="relative">
+            <select id="citySelect" name="city"
+                    class="appearance-none w-full rounded-xl border border-slate-300 bg-white px-4 py-3 pr-10 text-slate-900
+                           focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400">
+              <option value="">All cities</option>
+              {% for city in cities %}
+                <option value="{{ city }}" {% if selected_city and selected_city == city %}selected{% endif %}>
+                  {{ city }}
+                </option>
+              {% endfor %}
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="md:col-span-3 flex justify-end gap-3 pt-2">
+          <a href="{% url 'users:find_service' %}"
+             class="inline-flex items-center justify-center px-5 py-3 rounded-xl border border-slate-300 bg-white
+                    text-slate-800 font-semibold hover:bg-slate-50 transition">
+            Clear
+          </a>
+
+          <button type="submit"
+                  class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-emerald-500 text-slate-900
+                         font-extrabold hover:bg-emerald-600 transition shadow focus:outline-none focus:ring-2 focus:ring-emerald-200">
+            Search →
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- Results -->
+    <section class="bg-white rounded-2xl shadow border border-slate-200 p-6 md:p-8">
+      <div class="flex items-center justify-between gap-3 mb-5">
+        <h3 class="text-lg font-extrabold text-slate-900">Available tradespeople</h3>
+        <div id="resultsMeta" class="text-sm font-semibold text-slate-600">Ready</div>
+      </div>
+
+      <div id="resultsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {# JS injects cards here #}
+      </div>
+    </section>
+
+  </div>
+</div>
+
+{# ✅ Provide URLs to JS cleanly #}
+<script>
+  window.TRADES_SEARCH_API_URL = "{% url 'users:api_find_service' %}";
+  // Base should end with a trailing slash.
+  // If your profile URL is like /users/profile/<id>/ then use that base.
+  window.TRADES_PROFILE_BASE_URL = "/profile/";
+</script>
+
+<script src="{% static 'users/js/find_service_filters.js' %}"></script>
+{% endblock %}

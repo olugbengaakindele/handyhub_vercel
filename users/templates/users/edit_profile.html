@@ -1,0 +1,93 @@
+{% extends "./base.html" %}
+{% load widget_tweaks %}
+
+{% block body %}
+<div class="min-h-screen bg-slate-100 py-10">
+
+  <div class="max-w-3xl mx-auto px-4">
+
+    <div class="bg-white rounded-xl shadow p-8">
+
+      <div class="flex items-center justify-between mb-6">
+        <a href="{% url 'users:profile' %}"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl
+                  bg-emerald-50 text-emerald-700 border border-emerald-200
+                  hover:bg-emerald-100 hover:text-emerald-800
+                  transition text-sm font-semibold shadow-sm">
+          ← Back to Profile
+        </a>
+      </div>
+
+      <h1 class="text-2xl font-bold text-slate-800 mb-6">
+        Edit Profile
+      </h1>
+
+      <form method="POST" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- First Name -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">
+            First Name
+          </label>
+          {% render_field form.user_firstname class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:outline-none" %}
+        </div>
+
+        <!-- Last Name -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">
+            Last Name
+          </label>
+          {% render_field form.user_last_name class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:outline-none" %}
+        </div>
+
+        <!-- Preferred Name -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">
+            Preferred Name
+          </label>
+          {% render_field form.user_preferred_name class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:outline-none" %}
+        </div>
+
+        <!-- Business Name -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">
+            Business Name (optional)
+          </label>
+          {% render_field form.user_business_name class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:outline-none" %}
+        </div>
+
+        <!-- ✅ Profile Summary -->
+        <!-- Profile Summary -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">
+            Profile Summary / About You
+          </label>
+
+          {% render_field form.profile_summary class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 focus:outline-none" rows="5" placeholder="Describe your experience, specialties, and what customers can expect when working with you..." %}
+
+          <p class="text-xs text-slate-500 mt-1">
+            This will appear on your profile so customers can learn more about you.
+          </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-end gap-4 pt-4">
+          <a href="{% url 'users:profile' %}"
+             class="px-6 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">
+            Cancel
+          </a>
+
+          <button
+            type="submit"
+            class="bg-emerald-500 text-slate-900 px-6 py-2 rounded-lg font-semibold hover:bg-emerald-600 transition">
+            Save Changes
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

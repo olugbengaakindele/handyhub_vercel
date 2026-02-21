@@ -1,0 +1,34 @@
+# Environment variables
+.env
+.env.*
+
+# Virtual environment (CRITICAL)
+Lib/
+Scripts/
+Include/
+pyvenv.cfg
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+
+# Media uploads
+pictures/
+
+# OS / Editor
+.vscode/
+.DS_Store
+
+local_settings.py
+/media
+venv
+/static
+run one time.sql
+runtime.txt

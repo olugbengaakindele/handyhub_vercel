@@ -1,0 +1,80 @@
+{% extends "users/base.html" %}
+
+{% block title %}Delete License | HandymenHub{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-slate-100 py-12 px-4">
+  <div class="max-w-xl mx-auto">
+
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+
+      <!-- Header -->
+      <div class="flex items-center gap-4 mb-6">
+        <div class="h-12 w-12 rounded-xl bg-red-100 text-red-700 flex items-center justify-center text-2xl">
+          ⚠️
+        </div>
+        <div>
+          <h1 class="text-2xl font-extrabold text-slate-900">
+            Delete License
+          </h1>
+          <p class="text-sm text-slate-500">
+            This action cannot be undone.
+          </p>
+        </div>
+      </div>
+
+      <!-- License summary -->
+      <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 mb-6">
+        <p class="font-bold text-slate-800">
+          {{ license.license_name }}
+        </p>
+
+        <p class="text-sm text-slate-600 mt-1">
+          {% if license.issuing_authority %}
+            {{ license.issuing_authority }}
+          {% else %}
+            Issuing authority not specified
+          {% endif %}
+          {% if license.province %}
+            · {{ license.province.name }}
+          {% endif %}
+        </p>
+
+        {% if license.expiry_date %}
+          <p class="text-xs text-slate-500 mt-1">
+            Expires on {{ license.expiry_date }}
+          </p>
+        {% endif %}
+      </div>
+
+      <!-- Warning -->
+      <div class="rounded-xl bg-red-50 border border-red-200 p-4 mb-6">
+        <p class="text-sm text-red-800 font-semibold">
+          Are you sure you want to permanently delete this license?
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <form method="post" class="flex items-center justify-between gap-4">
+        {% csrf_token %}
+
+        <a href="{% url 'users:licenses' %}"
+           class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition">
+          Cancel
+        </a>
+
+        <button type="submit"
+                class="inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-red-600 text-white font-extrabold hover:bg-red-700 transition">
+          Yes, delete
+        </button>
+      </form>
+
+    </div>
+
+    <p class="text-xs text-slate-500 mt-4 text-center">
+      HandymenHub does not verify licenses. Deleted licenses cannot be recovered.
+    </p>
+
+  </div>
+</div>
+{% endblock %}

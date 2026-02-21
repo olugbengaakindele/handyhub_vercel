@@ -1,0 +1,84 @@
+{% extends "./base.html" %}
+
+{% block body %}
+<div class="max-w-md mx-auto mt-16 bg-white shadow-xl rounded-2xl p-8 text-center">
+    <div class="flex items-center justify-between mb-6">
+        <a href="{% url 'users:profile' %}"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl
+                    bg-emerald-50 text-emerald-700 border border-emerald-200
+                    hover:bg-emerald-100 hover:text-emerald-800
+                    transition text-sm font-semibold shadow-sm">
+            ← Back to Profile
+        </a>
+    </div>
+    
+    <h2 class="text-2xl font-semibold text-slate-800 mb-6">
+        Edit Profile Picture
+    </h2>
+
+    <!-- Avatar Preview -->
+    <label for="id_user_profile_image" class="relative inline-block cursor-pointer group">
+        {% if profile.user_profile_image %}
+            <img
+                id="avatarPreview"
+                src="{{ profile.user_profile_image.url }}"
+                class="w-32 h-32 rounded-full object-cover border-4 border-emerald-500 transition group-hover:opacity-80"
+            />
+        {% else %}
+            <div
+                id="avatarPreview"
+                class="w-32 h-32 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 border-4 border-emerald-500"
+            >
+                No Image
+            </div>
+        {% endif %}
+
+        <span class="absolute bottom-1 right-1 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full">
+            Change
+        </span>
+    </label>
+
+    <!-- Form -->
+    <form method="POST" enctype="multipart/form-data" class="mt-6">
+        {% csrf_token %}
+
+        <!-- Hidden file input (prevents "Currently:" text) -->
+        <input
+            type="file"
+            name="user_profile_image"
+            id="id_user_profile_image"
+            accept="image/*"
+            class="hidden"
+        />
+
+        <div class="flex justify-center gap-4 mt-6">
+            <a
+                href="{% url 'users:profile'  %}"
+                class="px-5 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+            >
+                Save
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Live Preview Script -->
+<script>
+    const input = document.getElementById("id_user_profile_image");
+    const preview = document.getElementById("avatarPreview");
+
+    input.addEventListener("change", () => {
+        const file = input.files[0];
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+        }
+    });
+</script>
+{% endblock %}

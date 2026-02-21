@@ -1,0 +1,464 @@
+{% extends "./base.html" %}
+
+{% block title %}Help & FAQs | LocalTradePros{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-slate-100 py-10">
+  <div class="max-w-6xl mx-auto px-4 space-y-8">
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-900 text-white rounded-2xl shadow-xl overflow-hidden">
+      <div class="p-8 md:p-10">
+        <div class="flex items-start justify-between gap-6 flex-col md:flex-row">
+          <div>
+            <p class="inline-flex items-center gap-2 text-emerald-200/90 text-sm font-semibold bg-white/10 px-3 py-1 rounded-full">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              Help Center
+            </p>
+            <h1 class="mt-4 text-3xl md:text-4xl font-extrabold tracking-tight">
+              Help & FAQs
+            </h1>
+            <p class="mt-3 text-white/80 max-w-2xl">
+              Quick answers to common questions about searching, profiles, and messaging.
+              LocalTradePros is a discovery platform — we don’t verify pros, book services, or provide guarantees.
+            </p>
+          </div>
+
+          <!-- Quick actions -->
+          <div class="flex gap-3 w-full md:w-auto">
+            <a href="{% url 'contact:contact_us' %}"
+               class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-400 text-slate-950 font-semibold hover:bg-emerald-300 transition">
+              Contact Us
+              <span aria-hidden="true">→</span>
+            </a>
+            <a href="{% url 'users:find_service' %}"
+               class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/10 text-white font-semibold hover:bg-white/15 border border-white/10 transition">
+              Find a Service
+            </a>
+          </div>
+        </div>
+
+        <!-- Search box -->
+        <div class="mt-8">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-white/60">
+              <!-- magnifier -->
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                <path d="M21 21l-4.3-4.3m1.3-5.2a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <input id="faqSearch"
+                   type="text"
+                   placeholder="Search help topics (e.g. 'message', 'profile', 'city')..."
+                   class="w-full bg-white/10 text-white placeholder:text-white/60 rounded-2xl pl-12 pr-4 py-4 border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-300/60 focus:border-white/10" />
+          </div>
+          <p class="mt-2 text-sm text-white/60">
+            Tip: Type a keyword to quickly filter FAQs.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <button type="button"
+              data-faq-q="search"
+              class="text-left bg-white rounded-2xl shadow border border-slate-200 p-6 hover:border-emerald-200 hover:bg-emerald-50 transition">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-700">🔎</div>
+          <div>
+            <h3 class="font-extrabold text-slate-900">Search & discover</h3>
+            <p class="text-sm text-slate-600">Find pros by category and location.</p>
+          </div>
+        </div>
+      </button>
+
+      <button type="button"
+              data-faq-q="profile"
+              class="text-left bg-white rounded-2xl shadow border border-slate-200 p-6 hover:border-emerald-200 hover:bg-emerald-50 transition">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-700">👤</div>
+          <div>
+            <h3 class="font-extrabold text-slate-900">Profiles</h3>
+            <p class="text-sm text-slate-600">Compare services, bio, and details.</p>
+          </div>
+        </div>
+      </button>
+
+      <button type="button"
+              data-faq-q="message"
+              class="text-left bg-white rounded-2xl shadow border border-slate-200 p-6 hover:border-emerald-200 hover:bg-emerald-50 transition">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-700">💬</div>
+          <div>
+            <h3 class="font-extrabold text-slate-900">Messaging</h3>
+            <p class="text-sm text-slate-600">Reach out directly — no middleman.</p>
+          </div>
+        </div>
+      </button>
+    </div>
+
+
+
+    <!-- Main grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- Left: Categories / quick links -->
+      <aside class="lg:col-span-1 space-y-6">
+        <div class="bg-white rounded-2xl shadow border border-slate-200 p-6">
+          <h2 class="text-lg font-extrabold text-slate-900">Popular Topics</h2>
+          <p class="text-sm text-slate-600 mt-1">Jump to the section you need.</p>
+
+          <div class="mt-5 space-y-2">
+            <a href="#getting-started" class="group flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-emerald-200 hover:bg-emerald-50 transition">
+              <span class="font-semibold text-slate-800 group-hover:text-emerald-800">Getting started</span>
+              <span class="text-slate-400 group-hover:text-emerald-500">→</span>
+            </a>
+            <a href="#searching" class="group flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-emerald-200 hover:bg-emerald-50 transition">
+              <span class="font-semibold text-slate-800 group-hover:text-emerald-800">Searching & filters</span>
+              <span class="text-slate-400 group-hover:text-emerald-500">→</span>
+            </a>
+            <a href="#profiles" class="group flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-emerald-200 hover:bg-emerald-50 transition">
+              <span class="font-semibold text-slate-800 group-hover:text-emerald-800">Profiles & services</span>
+              <span class="text-slate-400 group-hover:text-emerald-500">→</span>
+            </a>
+            <a href="#messaging" class="group flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-emerald-200 hover:bg-emerald-50 transition">
+              <span class="font-semibold text-slate-800 group-hover:text-emerald-800">Messaging</span>
+              <span class="text-slate-400 group-hover:text-emerald-500">→</span>
+            </a>
+            <a href="#account" class="group flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-emerald-200 hover:bg-emerald-50 transition">
+              <span class="font-semibold text-slate-800 group-hover:text-emerald-800">Account & settings</span>
+              <span class="text-slate-400 group-hover:text-emerald-500">→</span>
+            </a>
+            <a href="#safety" class="group flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-emerald-200 hover:bg-emerald-50 transition">
+              <span class="font-semibold text-slate-800 group-hover:text-emerald-800">Safety & guidelines</span>
+              <span class="text-slate-400 group-hover:text-emerald-500">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Contact card -->
+        <div class="bg-slate-950 rounded-2xl shadow-xl p-6 text-white overflow-hidden relative">
+          <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-emerald-500/20 blur-2xl"></div>
+          <h3 class="text-lg font-extrabold">Still stuck?</h3>
+          <p class="text-sm text-white/75 mt-2">
+            Send us a message and we’ll help point you in the right direction.
+          </p>
+          <a href="{% url 'contact:contact_us' %}"
+             class="mt-5 inline-flex items-center justify-center w-full px-4 py-2.5 rounded-xl bg-emerald-400 text-slate-950 font-semibold hover:bg-emerald-300 transition">
+            Contact Support
+          </a>
+          <p class="text-xs text-white/60 mt-3">
+            Note: We don’t provide booking or customer support for services completed outside the platform.
+          </p>
+        </div>
+      </aside>
+
+      <!-- Right: FAQs -->
+      <section class="lg:col-span-2 space-y-8">
+
+        <!-- Getting started -->
+        <div id="getting-started" class="bg-white rounded-2xl shadow border border-slate-200">
+          <div class="p-6 md:p-8 border-b border-slate-200">
+            <h2 class="text-xl font-extrabold text-slate-900">Getting started</h2>
+            <p class="text-sm text-slate-600 mt-1">New here? Start with these basics.</p>
+          </div>
+
+          <div class="p-6 md:p-8 space-y-4">
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">What is LocalTradePros?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                LocalTradePros helps people discover local tradespeople and connect directly.
+                We don’t verify professionals, book jobs, or provide service guarantees — we simply make it easier to find and message pros.
+              </div>
+            </details>
+
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">Do I need an account to search?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                You can browse and search without an account.  
+                Creating an account may be required for certain actions like messaging (depending on how you’ve set it up).
+              </div>
+            </details>
+
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">I’m a pro — how do I create a profile?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                Click <span class="font-semibold">“I’m a Pro (Create Profile)”</span> on the home page, complete your details,
+                add services and areas you cover, then save. Your profile will be visible for people to find and message you.
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Searching -->
+        <div id="searching" class="bg-white rounded-2xl shadow border border-slate-200">
+          <div class="p-6 md:p-8 border-b border-slate-200">
+            <h2 class="text-xl font-extrabold text-slate-900">Searching & filters</h2>
+            <p class="text-sm text-slate-600 mt-1">Find the right pro faster.</p>
+          </div>
+
+          <div class="p-6 md:p-8 space-y-4">
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">Why are my dropdown filters empty?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                This usually happens if categories / cities haven’t been seeded in the database,
+                or if your view isn’t passing the queryset into the template context.
+                Confirm you have records and that your template is using the correct context variables.
+              </div>
+            </details>
+
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">Why am I seeing no results?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                Check these common causes:
+                <ul class="mt-2 list-disc pl-5 space-y-1">
+                  <li>No pros are listed for that category/city yet.</li>
+                  <li>The pro hasn’t added that service to their profile.</li>
+                  <li>Your query logic is filtering too strictly (e.g., requiring both subcategory and city).</li>
+                </ul>
+              </div>
+            </details>
+
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">Can I search by city only?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                Yes — if you’ve built the filter that way. Many people start with a city and then narrow down by category.
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Profiles -->
+        <div id="profiles" class="bg-white rounded-2xl shadow border border-slate-200">
+          <div class="p-6 md:p-8 border-b border-slate-200">
+            <h2 class="text-xl font-extrabold text-slate-900">Profiles & services</h2>
+            <p class="text-sm text-slate-600 mt-1">How to understand and manage profile info.</p>
+          </div>
+
+          <div class="p-6 md:p-8 space-y-4">
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">Do you verify tradespeople?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                No. LocalTradePros is a discovery platform only — you should always do your own checks
+                (licenses, insurance, references, written quotes, etc.) before hiring.
+              </div>
+            </details>
+
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">How do I add or remove services from my profile?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                Go to your profile settings and open “Manage Services”.
+                From there you can add new services or remove existing ones.
+              </div>
+            </details>
+
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">Can I add multiple service areas?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                Yes — add the cities/regions you cover so you appear in more searches.
+                Keep it accurate so clients know your real coverage area.
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Messaging -->
+        <div id="messaging" class="bg-white rounded-2xl shadow border border-slate-200">
+          <div class="p-6 md:p-8 border-b border-slate-200">
+            <h2 class="text-xl font-extrabold text-slate-900">Messaging</h2>
+            <p class="text-sm text-slate-600 mt-1">Communicate directly with pros.</p>
+          </div>
+
+          <div class="p-6 md:p-8 space-y-4">
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">How do I message a pro?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                Open a pro’s profile and click the “Message” button (or go to the Messages page).
+                Introduce yourself, share your location, and describe the job clearly.
+              </div>
+            </details>
+
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">What should I include in my first message?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                A good first message includes:
+                <ul class="mt-2 list-disc pl-5 space-y-1">
+                  <li>What you need done (short + specific)</li>
+                  <li>Where you are (city/neighborhood)</li>
+                  <li>Your timeframe (ASAP, this week, weekend)</li>
+                  <li>Any photos or details (if applicable)</li>
+                </ul>
+              </div>
+            </details>
+
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">Do you monitor or moderate messages?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                Not actively. Please be respectful and avoid sharing sensitive personal information.
+                If you receive spam or abuse, use the Contact Us page to report it.
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Account -->
+        <div id="account" class="bg-white rounded-2xl shadow border border-slate-200">
+          <div class="p-6 md:p-8 border-b border-slate-200">
+            <h2 class="text-xl font-extrabold text-slate-900">Account & settings</h2>
+            <p class="text-sm text-slate-600 mt-1">Common login and profile setup questions.</p>
+          </div>
+
+          <div class="p-6 md:p-8 space-y-4">
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">I can’t log in — what should I check?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                Confirm your email/password is correct, then try resetting your password if available.
+                If you recently created an account, ensure your profile was successfully created too.
+              </div>
+            </details>
+
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">How do I update my profile details?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                Go to <span class="font-semibold">Account</span> and open your profile settings.
+                Update your details and save changes.
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Safety -->
+        <div id="safety" class="bg-white rounded-2xl shadow border border-slate-200">
+          <div class="p-6 md:p-8 border-b border-slate-200">
+            <h2 class="text-xl font-extrabold text-slate-900">Safety & guidelines</h2>
+            <p class="text-sm text-slate-600 mt-1">Best practices when hiring or working with clients.</p>
+          </div>
+
+          <div class="p-6 md:p-8 space-y-4">
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">What checks should clients do before hiring?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                Ask for licenses (if applicable), insurance, references, and written quotes.
+                Use clear agreements and avoid paying in full upfront.
+              </div>
+            </details>
+
+            <details class="faq-item group rounded-xl border border-slate-200 p-4">
+              <summary class="cursor-pointer list-none flex items-center justify-between gap-4">
+                <span class="font-semibold text-slate-900">What should pros do to stay protected?</span>
+                <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+              </summary>
+              <div class="mt-3 text-sm text-slate-600 leading-relaxed">
+                Keep messages professional, clarify scope before starting work,
+                and ensure you have the proper insurance and documentation for your trade.
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Footer note -->
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h3 class="font-extrabold text-emerald-900">Want to suggest an FAQ?</h3>
+              <p class="text-sm text-emerald-900/80 mt-1">
+                If you keep seeing a common issue, message us and we’ll add it here.
+              </p>
+            </div>
+            <a href="{% url 'contact:contact_us' %}"
+               class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-slate-950 text-white font-semibold hover:bg-slate-900 transition">
+              Suggest a question
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Tiny FAQ search filter (optional) -->
+  <script>
+    (function () {
+      const input = document.getElementById("faqSearch");
+      if (!input) return;
+
+      const items = Array.from(document.querySelectorAll(".faq-item"));
+      const cardButtons = Array.from(document.querySelectorAll("[data-faq-q]"));
+
+      function applyFilter(q) {
+        const query = (q || "").trim().toLowerCase();
+
+        items.forEach((el) => {
+          const text = el.innerText.toLowerCase();
+          el.style.display = text.includes(query) ? "" : "none";
+        });
+
+        // Auto-open + scroll to the first visible FAQ
+        const firstVisible = items.find(el => el.style.display !== "none");
+        if (firstVisible) {
+          const details = firstVisible.closest("details") || firstVisible;
+          if (details.tagName === "DETAILS") details.open = true;
+          firstVisible.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+
+      input.addEventListener("input", () => applyFilter(input.value));
+
+      cardButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const q = btn.getAttribute("data-faq-q") || "";
+          input.value = q;
+          applyFilter(q);
+        });
+      });
+    })();
+  </script>
+
+{% endblock %}

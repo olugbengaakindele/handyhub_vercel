@@ -1,0 +1,75 @@
+{% extends "./base.html" %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-100 flex items-center justify-center px-6">
+    <div class="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10">
+        
+        <!-- Logo / Title -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-800">LocalTradePros</h1>
+            <p class="text-2xl font-semibold mt-1 text-gray-800">Sign In</p>
+        </div>
+
+        <!-- Login Form -->
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Non-field errors -->
+            {% if form.non_field_errors %}
+                <div class="mb-4">
+                    {% for error in form.non_field_errors %}
+                        <p class="text-red-500 text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Messages -->
+            {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                        <p class="text-red-500 text-sm">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Username / Email -->
+            <div>
+                <label class="block text-gray-700 font-medium mb-1" for="id_username">Email</label>
+                {{ form.username|add_class:"w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-teal-300 focus:border-teal-500" }}
+                {% if form.username.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.username.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label class="block text-gray-700 font-medium mb-1" for="id_password">Password</label>
+                {{ form.password|add_class:"w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-teal-300 focus:border-teal-500" }}
+                {% if form.password.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.password.errors.0 }}</p>
+                {% endif %}
+
+                <div class="mt-2 text-right">
+                    <a href="{% url 'users:password_reset' %}" class="text-sm text-blue-500 hover:underline">
+                        Forgot Password?
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sign in Button -->
+            <button type="submit" class="w-full bg-teal-500 text-white py-3 rounded-xl font-medium hover:bg-teal-600 transition">
+                Sign In
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <p class="text-center text-sm text-gray-600 mt-8">
+            Don’t have an account yet?
+            <a href="{% url 'users:register' %}" class="text-blue-500 font-medium hover:underline">Register for Free</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

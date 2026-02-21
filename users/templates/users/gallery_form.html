@@ -1,0 +1,77 @@
+{% extends "./base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}{% if mode == "edit" %}Edit Photo{% else %}Add Photo{% endif %} | HandymenHub{% endblock %}
+
+{% if mode == "add" %}
+  <p class="text-xs text-slate-500 mt-2">
+    You can upload <span class="font-semibold">{{ remaining }}</span> more photo(s) on your current plan.
+    Max size: <span class="font-semibold">500KB</span> per photo.
+  </p>
+{% endif %}
+
+{% block body %}
+<div class="min-h-screen bg-slate-100 py-10">
+  <div class="max-w-3xl mx-auto px-4">
+    <div class="flex items-center justify-between mb-6">
+      <a href="{% url 'users:profile' %}"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl
+                bg-emerald-50 text-emerald-700 border border-emerald-200
+                hover:bg-emerald-100 hover:text-emerald-800
+                transition text-sm font-semibold shadow-sm">
+        ← Back to Profile
+      </a>
+    </div>
+    <div class="bg-white rounded-2xl shadow border border-slate-200 p-6 md:p-8">
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-2xl font-extrabold text-slate-900">
+            {% if mode == "edit" %}Edit Gallery Photo{% else %}Add Gallery Photo{% endif %}
+          </h1>
+          <p class="text-slate-500 text-sm mt-1">Upload a photo and add a short description (max 100 words).</p>
+        </div>
+
+        <a href="{% url 'users:gallery_list' %}"
+           class="text-sm font-semibold text-emerald-700 hover:underline">
+          Back to gallery
+        </a>
+      </div>
+
+      <form method="post" enctype="multipart/form-data" class="space-y-5">
+        {% csrf_token %}
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">Photo</label>
+          {% render_field form.image class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400" %}
+          {% if form.image.errors %}
+            <p class="text-sm text-red-600 mt-2">{{ form.image.errors|striptags }}</p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">Description</label>
+          {% render_field form.description class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400" %}
+          <p class="text-xs text-slate-500 mt-2">Keep it short. Max 100 words.</p>
+          {% if form.description.errors %}
+            <p class="text-sm text-red-600 mt-2">{{ form.description.errors|striptags }}</p>
+          {% endif %}
+        </div>
+
+        <div class="flex gap-3 justify-end pt-2">
+          <a href="{% url 'users:gallery_list' %}"
+             class="inline-flex items-center justify-center px-5 py-3 rounded-xl border border-slate-300 bg-white
+                    text-slate-800 font-semibold hover:bg-slate-50 transition">
+            Cancel
+          </a>
+          <button type="submit"
+                  class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-emerald-500 text-slate-900
+                         font-extrabold hover:bg-emerald-600 transition shadow focus:outline-none focus:ring-2 focus:ring-emerald-200">
+            {% if mode == "edit" %}Save Changes{% else %}Upload Photo{% endif %}
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

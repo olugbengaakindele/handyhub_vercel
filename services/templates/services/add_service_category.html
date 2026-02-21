@@ -1,0 +1,40 @@
+
+{% extends "users/base.html" %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+
+{% block body %}
+    <div class="min-h-screen bg-gray-100 py-10">
+        <div class="max-w-xl mx-auto bg-white shadow-lg rounded-xl p-8">
+
+            <!-- Header -->
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                Add Service Category
+            </h2>
+
+            <!-- Form -->
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Name Field -->
+                <div>
+                    <label class="block mb-2 font-semibold text-gray-700">
+                        Category Name
+                    </label>
+                    {% render_field form.name class+="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" %}
+                </div>
+
+                <!-- Submit Button -->
+                <button
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold 
+                        hover:bg-blue-700 active:bg-blue-800 transition duration-200">
+                    Add Category
+                </button>
+            </form>
+
+            
+        </div>
+    </div>
+{% endblock %}

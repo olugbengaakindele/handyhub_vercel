@@ -1,0 +1,63 @@
+{% extends "./base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block body %}
+<div class="max-w-3xl mx-auto p-6 bg-gray-100 rounded-lg shadow">
+    <div class="flex items-center justify-between mb-6">
+        <a href="{% url 'users:profile' %}"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl
+                    bg-emerald-50 text-emerald-700 border border-emerald-200
+                    hover:bg-emerald-100 hover:text-emerald-800
+                    transition text-sm font-semibold shadow-sm">
+            ← Back to Profile
+        </a>
+    </div>
+    <h2 class="text-2xl font-bold text-green-700 mb-4">Edit Contact</h2>   
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 gap-4">
+
+            <!-- Contact Information -->
+            <h3 class="text-lg font-semibold text-green-800 mt-2">Contact Information</h3>
+            
+            <div>
+                {{ form.user_primary_phone.label_tag }}
+                {% render_field form.user_primary_phone class="border rounded p-2 w-full" %}
+                {% if form.user_primary_phone.errors %}
+                    <p class="text-red-600 text-sm">{{ form.user_primary_phone.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.user_secondary_phone.label_tag }}
+                {% render_field form.user_secondary_phone class="border rounded p-2 w-full" %}
+                {% if form.user_secondary_phone.errors %}
+                    <p class="text-red-600 text-sm">{{ form.user_secondary_phone.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.user_business_phone.label_tag }}
+                {% render_field form.user_business_phone class="border rounded p-2 w-full" %}
+                {% if form.user_business_phone.errors %}
+                    <p class="text-red-600 text-sm">{{ form.user_business_phone.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.user_website.label_tag }}
+                {% render_field form.user_website type="text" class="border rounded p-2 w-full" placeholder="https://www.yourbusiness.com" %}
+                {% if form.user_website.errors %}
+                    <p class="text-red-600 text-sm">{{ form.user_website.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+           
+        </div>
+
+        <button type="submit" class="mt-6 px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800">Update Information</button>
+    </form>
+</div>
+{% endblock %}

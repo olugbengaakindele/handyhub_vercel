@@ -1,0 +1,291 @@
+{% extends "./base.html" %}
+
+{% block title %}
+  {{ profile.user_business_name|default:user_obj.get_full_name }} | LocalTradePros
+{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-slate-100 py-10">
+  <div class="max-w-7xl mx-auto px-4">
+
+    <!-- Top actions -->
+    <div class="flex items-center justify-between gap-4 mb-6">
+      <a href="{% url 'users:find_service' %}"
+         class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-800
+                hover:bg-slate-50 hover:border-emerald-200 transition text-sm font-extrabold shadow-sm">
+        ← Back to search results
+      </a>
+
+      <a href="{% url 'messaging:start' user_obj.id %}"
+         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold
+                hover:bg-emerald-700 transition shadow">
+        💬 Message
+      </a>
+    </div>
+
+    <!-- GITHUB-STYLE LAYOUT -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+      <!-- LEFT SIDEBAR -->
+      <aside class="lg:col-span-4">
+
+        <!-- Profile Card -->
+        <div class="bg-white rounded-3xl shadow border border-slate-200 overflow-hidden">
+          <div class="p-6">
+
+            <div class="flex items-start gap-4">
+              {% if profile.user_profile_image %}
+                <img src="{{ profile.user_profile_image.url }}"
+                     alt="Profile photo"
+                     class="h-24 w-24 rounded-2xl object-cover border border-slate-200 shadow-sm" />
+              {% else %}
+                <div class="h-24 w-24 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 text-sm font-bold">
+                  No Photo
+                </div>
+              {% endif %}
+
+              <div class="min-w-0 flex-1">
+                <h6 class="text-1x2 font-bold text-slate-800 leading-tight truncate">
+                  {{ profile.user_business_name|default:user_obj.get_full_name }}
+                </h6>
+
+                <p class="text-sm text-slate-600 mt-1">
+                  {% if profile.user_city or profile.user_province %}
+                    {{ profile.user_city }}{% if profile.user_province %}, {{ profile.user_province }}{% endif %}
+                  {% else %}
+                    Location not provided
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+
+            {% if profile.profile_summary %}
+              <p class="text-sm text-slate-700 leading-relaxed mt-5">
+                {{ profile.profile_summary }}
+              </p>
+            {% else %}
+              <p class="text-sm text-slate-500 mt-5">
+                No description has been added yet.
+              </p>
+            {% endif %}
+
+            <div class="mt-6">
+              <a href="{% url 'messaging:start' user_obj.id %}"
+                 class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 text-white px-5 py-3 font-extrabold hover:bg-emerald-700 transition shadow">
+                💬 Message
+              </a>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-200 bg-slate-50 px-6 py-4">
+            <p class="text-xs text-slate-600">
+              LocalTradePros is a discovery platform only. We don’t verify professionals, book services, or provide guarantees.
+            </p>
+          </div>
+        </div>
+
+        <!-- Contact Card -->
+        <div class="bg-white rounded-3xl shadow border border-slate-200 p-6 mt-6">
+          <h2 class="text-sm font-extrabold text-slate-900">Contact</h2>
+          <p class="text-xs text-slate-500 mt-1">Reach out directly (off-platform).</p>
+
+          <div class="mt-4 space-y-3 text-sm">
+
+            {% if profile.user_primary_phone %}
+              <div class="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div class="min-w-0">
+                  <div class="text-[11px] font-bold text-slate-500">Phone</div>
+                  <div class="font-extrabold text-slate-900 truncate">{{ profile.user_primary_phone }}</div>
+                </div>
+                <a href="tel:{{ profile.user_primary_phone|cut:' ' }}"
+                   class="text-emerald-700 text-xs font-extrabold hover:underline">
+                  Call
+                </a>
+              </div>
+            {% endif %}
+
+            {% if user_obj.email %}
+              <div class="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div class="min-w-0">
+                  <div class="text-[11px] font-bold text-slate-500">Email</div>
+                  <div class="font-extrabold text-slate-900 truncate">{{ user_obj.email }}</div>
+                </div>
+                <a href="mailto:{{ user_obj.email }}"
+                   class="text-emerald-700 text-xs font-extrabold hover:underline">
+                  Email
+                </a>
+              </div>
+            {% endif %}
+
+            {% if profile.address_line1 or profile.address_line2 or profile.user_city or profile.user_province or profile.postal_code %}
+              <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div class="text-[11px] font-bold text-slate-500">Address</div>
+                <div class="text-sm font-semibold text-slate-800 leading-relaxed">
+                  {% if profile.address_line1 %}{{ profile.address_line1 }}{% endif %}
+                  {% if profile.address_line2 %}, {{ profile.address_line2 }}{% endif %}
+                  <br />
+                  {% if profile.user_city %}{{ profile.user_city }}{% endif %}
+                  {% if profile.user_province %}{% if profile.user_city %}, {% endif %}{{ profile.user_province }}{% endif %}
+                  {% if profile.postal_code %} {{ profile.postal_code }}{% endif %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+
+          {% if profile.website_url or profile.instagram_url or profile.facebook_url or profile.twitter_url or profile.linkedin_url %}
+            <div class="mt-5">
+              <h3 class="text-xs font-extrabold text-slate-700 mb-2">Social</h3>
+              <div class="flex flex-wrap gap-2">
+                {% if profile.website_url %}
+                  <a href="{{ profile.website_url }}" target="_blank" rel="noopener"
+                     class="px-3 py-1.5 rounded-full bg-slate-900 text-white text-xs font-extrabold hover:bg-slate-800 transition">
+                    Website
+                  </a>
+                {% endif %}
+                {% if profile.instagram_url %}
+                  <a href="{{ profile.instagram_url }}" target="_blank" rel="noopener"
+                     class="px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-extrabold hover:bg-emerald-100 transition">
+                    Instagram
+                  </a>
+                {% endif %}
+                {% if profile.facebook_url %}
+                  <a href="{{ profile.facebook_url }}" target="_blank" rel="noopener"
+                     class="px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-extrabold hover:bg-emerald-100 transition">
+                    Facebook
+                  </a>
+                {% endif %}
+                {% if profile.twitter_url %}
+                  <a href="{{ profile.twitter_url }}" target="_blank" rel="noopener"
+                     class="px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-extrabold hover:bg-emerald-100 transition">
+                    X
+                  </a>
+                {% endif %}
+                {% if profile.linkedin_url %}
+                  <a href="{{ profile.linkedin_url }}" target="_blank" rel="noopener"
+                     class="px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-extrabold hover:bg-emerald-100 transition">
+                    LinkedIn
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Achievements (placeholder for future model) -->
+        <div class="bg-white rounded-3xl shadow border border-slate-200 p-6 mt-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-extrabold text-slate-900">Achievements</h2>
+            <span class="text-xs text-slate-500">Coming soon</span>
+          </div>
+
+          <div class="mt-4 grid grid-cols-3 gap-3">
+            <div class="h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-xs font-extrabold text-slate-500">
+              Badge
+            </div>
+            <div class="h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-xs font-extrabold text-slate-500">
+              Badge
+            </div>
+            <div class="h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-xs font-extrabold text-slate-500">
+              Badge
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-500 mt-4">
+            You’ll be able to showcase certifications, awards, and licenses here.
+          </p>
+        </div>
+
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="lg:col-span-8 space-y-8">
+
+        <!-- Call-out fee (moved here - compact bar) -->
+        {% if callout_settings and callout_settings.enabled and callout_settings.amount %}
+          <section class="bg-white rounded-3xl shadow border border-slate-200 p-5 md:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div class="shrink-0 h-10 w-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                  <span class="text-emerald-800 font-extrabold">📞</span>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-xs font-extrabold text-slate-500 uppercase tracking-wide">Call-out fee</div>
+                  <div class="text-lg font-extrabold text-slate-900">${{ callout_settings.amount }}</div>
+                  {% if callout_settings.note %}
+                    <div class="text-sm text-slate-600 mt-0.5">{{ callout_settings.note }}</div>
+                  {% else %}
+                    <div class="text-sm text-slate-500 mt-0.5">Assessment/diagnosis fee (if applicable).</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="text-xs text-slate-500">
+                Pricing may vary by job type.
+              </div>
+            </div>
+          </section>
+        {% endif %}
+
+        <!-- Services Offered -->
+        <section class="bg-white rounded-3xl shadow border border-slate-200 p-6 md:p-8">
+          <div class="flex items-center justify-between gap-4 mb-5">
+            <h2 class="text-lg font-extrabold text-slate-900">Services Offered</h2>
+            <span class="text-xs text-slate-500">What they do</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {% for s in services %}
+              <div class="rounded-2xl border border-slate-200 p-4 hover:border-emerald-200 hover:bg-emerald-50/40 transition">
+                <div class="font-extrabold text-slate-900">{{ s.subcategory.name }}</div>
+                <div class="text-xs text-slate-500 mt-1">{{ s.category.name }}</div>
+              </div>
+            {% empty %}
+              <p class="text-slate-500">No services listed.</p>
+            {% endfor %}
+          </div>
+        </section>
+
+        <!-- Service Areas -->
+        <section class="bg-white rounded-3xl shadow border border-slate-200 p-6 md:p-8">
+          <div class="flex items-center justify-between gap-4 mb-4">
+            <h2 class="text-lg font-extrabold text-slate-900">Service Areas</h2>
+            <span class="text-xs text-slate-500">Where they work</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            {% for area in service_areas %}
+              <span class="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-sm font-bold">
+                {{ area.city|default:area.name|default:area.metro_city }}
+              </span>
+            {% empty %}
+              <span class="text-slate-500">No service areas listed.</span>
+            {% endfor %}
+          </div>
+        </section>
+
+        <!-- Gallery -->
+        {% if gallery %}
+          <section class="bg-white rounded-3xl shadow border border-slate-200 p-6 md:p-8">
+            <div class="flex items-center justify-between gap-4 mb-4">
+              <h2 class="text-lg font-extrabold text-slate-900">Gallery</h2>
+              <span class="text-xs text-slate-500">Recent work photos</span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {% for photo in gallery %}
+                <a href="{{ photo.image.url }}" class="block group">
+                  <img src="{{ photo.image.url }}"
+                       alt="Work photo"
+                       class="h-36 w-full object-cover rounded-2xl border border-slate-200 group-hover:shadow transition" />
+                </a>
+              {% endfor %}
+            </div>
+          </section>
+        {% endif %}
+
+      </main>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

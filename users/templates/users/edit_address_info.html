@@ -1,0 +1,73 @@
+{% extends "./base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block body %}
+<div class="max-w-3xl mx-auto p-6 bg-gray-100 rounded-lg shadow">
+    
+    <div class="flex items-center justify-between mb-6">
+        <a href="{% url 'users:profile' %}"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl
+                    bg-emerald-50 text-emerald-700 border border-emerald-200
+                    hover:bg-emerald-100 hover:text-emerald-800
+                    transition text-sm font-semibold shadow-sm">
+            ← Back to Profile
+        </a>
+    </div>
+
+    <h2 class="text-2xl font-bold text-green-700 mb-4">Edit Address</h2>   
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 gap-4">
+
+           
+            <!-- Address Information -->
+            <h3 class="text-lg font-semibold text-green-800 mt-4">Address Information</h3>
+            
+            <div>
+                {{ form.user_address_line1.label_tag }}
+                {% render_field form.user_address_line1 class="border rounded p-2 w-full" %}
+                {% if form.user_address_line1.errors %}
+                    <p class="text-red-600 text-sm">{{ form.user_address_line1.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.user_address_line2.label_tag }}
+                {% render_field form.user_address_line2 class="border rounded p-2 w-full" %}
+                {% if form.user_address_line2.errors %}
+                    <p class="text-red-600 text-sm">{{ form.user_address_line2.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.user_city.label_tag }}
+                {% render_field form.user_city class="border rounded p-2 w-full" %}
+                {% if form.user_city.errors %}
+                    <p class="text-red-600 text-sm">{{ form.user_city.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.user_province.label_tag }}
+                {% render_field form.user_province class="border rounded p-2 w-full" %}
+                {% if form.user_province.errors %}
+                    <p class="text-red-600 text-sm">{{ form.user_province.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.user_postal_code.label_tag }}
+                {% render_field form.user_postal_code class="border rounded p-2 w-full" %}
+                {% if form.user_postal_code.errors %}
+                    <p class="text-red-600 text-sm">{{ form.user_postal_code.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <button type="submit" class="mt-6 px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800">Update Information</button>
+    </form>
+</div>
+{% endblock %}

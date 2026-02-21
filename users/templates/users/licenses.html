@@ -1,0 +1,260 @@
+{% extends "users/base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Licenses | HandymenHub{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-slate-100 py-10">
+  <div class="max-w-6xl mx-auto px-4 space-y-8">
+
+    <!-- Header -->
+    <div class="bg-white rounded-2xl shadow border border-slate-200 p-6 md:p-8 flex items-start justify-between gap-6">
+      <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Licenses</h1>
+        <p class="text-slate-500 text-sm mt-1">
+          Add licenses/certifications you want visitors to see. HandymenHub does not verify licenses.
+        </p>
+      </div>
+
+      <a href="{% url 'users:profile' %}"
+         class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition">
+        ← Back to Profile
+      </a>
+    </div>
+
+    {% if messages %}
+      <div class="space-y-2">
+        {% for message in messages %}
+          <div class="rounded-xl px-4 py-3 text-sm font-semibold border
+            {% if message.tags == 'success' %}
+              bg-emerald-100 text-emerald-800 border-emerald-200
+            {% elif message.tags == 'error' %}
+              bg-red-100 text-red-800 border-red-200
+            {% else %}
+              bg-slate-100 text-slate-800 border-slate-200
+            {% endif %}
+          ">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+      <!-- Add License Form -->
+      <section class="bg-white rounded-2xl shadow border border-slate-200 p-6 md:p-7">
+        <div class="flex items-start justify-between gap-4 mb-5">
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900">Add a License</h2>
+            <p class="text-sm text-slate-500 mt-1">
+              Fill what you can. You can upload a PDF/JPG/PNG if available.
+            </p>
+          </div>
+          <span class="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700">
+            🪪
+          </span>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-4">
+          {% csrf_token %}
+
+          <!-- License name -->
+          <div>
+            <label class="text-sm font-semibold text-slate-700">License name</label>
+            {% render_field form.license_name class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" %}
+            {% if form.license_name.errors %}
+              <p class="text-sm text-red-600 mt-1">{{ form.license_name.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Issuing authority -->
+          <div>
+            <label class="text-sm font-semibold text-slate-700">Issuing authority</label>
+            {% render_field form.issuing_authority class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" %}
+            {% if form.issuing_authority.errors %}
+              <p class="text-sm text-red-600 mt-1">{{ form.issuing_authority.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          <!-- License number -->
+          <div>
+            <label class="text-sm font-semibold text-slate-700">License number (optional)</label>
+            {% render_field form.license_number class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" %}
+            {% if form.license_number.errors %}
+              <p class="text-sm text-red-600 mt-1">{{ form.license_number.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Province -->
+          <div>
+            <label class="text-sm font-semibold text-slate-700">Province (optional)</label>
+            {% render_field form.province class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2.5 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" %}
+            {% if form.province.errors %}
+              <p class="text-sm text-red-600 mt-1">{{ form.province.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Dates -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-semibold text-slate-700">Issue date (optional)</label>
+              {% render_field form.issue_date class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" %}
+              {% if form.issue_date.errors %}
+                <p class="text-sm text-red-600 mt-1">{{ form.issue_date.errors|striptags }}</p>
+              {% endif %}
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-700">Expiry date (optional)</label>
+              {% render_field form.expiry_date class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" %}
+              {% if form.expiry_date.errors %}
+                <p class="text-sm text-red-600 mt-1">{{ form.expiry_date.errors|striptags }}</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div>
+            <label class="text-sm font-semibold text-slate-700">Status</label>
+            {% render_field form.status class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2.5 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" %}
+            {% if form.status.errors %}
+              <p class="text-sm text-red-600 mt-1">{{ form.status.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Public visibility -->
+          <div class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            {% render_field form.public_visibility class="mt-1 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" %}
+            <div>
+              <p class="text-sm font-semibold text-slate-800">Show on public profile</p>
+              <p class="text-xs text-slate-500 mt-0.5">
+                If unchecked, this license stays private to you.
+              </p>
+              {% if form.public_visibility.errors %}
+                <p class="text-sm text-red-600 mt-1">{{ form.public_visibility.errors|striptags }}</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Document -->
+          <div>
+            <label class="text-sm font-semibold text-slate-700">Upload document (optional)</label>
+            {% render_field form.document class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2 bg-white" %}
+            <p class="text-xs text-slate-500 mt-1">PDF, JPG, or PNG recommended.</p>
+            {% if form.document.errors %}
+              <p class="text-sm text-red-600 mt-1">{{ form.document.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Notes -->
+          <div>
+            <label class="text-sm font-semibold text-slate-700">Notes (optional)</label>
+            {% render_field form.notes class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" %}
+            {% if form.notes.errors %}
+              <p class="text-sm text-red-600 mt-1">{{ form.notes.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          <button type="submit"
+                  class="w-full rounded-xl bg-emerald-600 text-white font-extrabold py-3 hover:bg-emerald-700 transition">
+            Add License
+          </button>
+        </form>
+      </section>
+
+      <!-- Licenses List -->
+      <section class="bg-white rounded-2xl shadow border border-slate-200 p-6 md:p-7">
+        <div class="flex items-start justify-between gap-4 mb-5">
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900">Your Licenses</h2>
+            <p class="text-sm text-slate-500 mt-1">Manage what you’ve added.</p>
+          </div>
+          <span class="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-slate-900 text-white">
+            📄
+          </span>
+        </div>
+
+        {% if licenses %}
+          <div class="space-y-3">
+            {% for lic in licenses %}
+              <div class="rounded-2xl border border-slate-200 p-4">
+                <div class="flex items-start justify-between gap-4">
+                  <div class="min-w-0">
+                    <p class="font-extrabold text-slate-900 truncate">
+                      {{ lic.license_name }}
+                    </p>
+
+                    <p class="text-sm text-slate-600 mt-1">
+                      {% if lic.issuing_authority %}{{ lic.issuing_authority }}{% else %}—{% endif %}
+                      {% if lic.province %} · {{ lic.province.code }}{% endif %}
+                      {% if lic.license_number %} · #{{ lic.license_number }}{% endif %}
+                    </p>
+
+                    <div class="mt-2 flex flex-wrap items-center gap-2">
+                      <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border
+                        {% if lic.status == 'active' %}
+                          bg-emerald-100 text-emerald-800 border-emerald-200
+                        {% elif lic.status == 'expired' %}
+                          bg-red-100 text-red-800 border-red-200
+                        {% else %}
+                          bg-amber-100 text-amber-800 border-amber-200
+                        {% endif %}
+                      ">
+                        {{ lic.get_status_display }}
+                      </span>
+
+                      {% if lic.expiry_date %}
+                        <span class="text-xs text-slate-500">
+                          Expires: <span class="font-semibold">{{ lic.expiry_date }}</span>
+                        </span>
+                      {% endif %}
+
+                      {% if not lic.public_visibility %}
+                        <span class="text-xs text-slate-500 italic">
+                          Hidden from public profile
+                        </span>
+                      {% endif %}
+                    </div>
+
+                    {% if lic.document %}
+                      <a href="{{ lic.document.url }}" target="_blank"
+                         class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800 mt-3">
+                        View document →
+                      </a>
+                    {% endif %}
+
+                    {% if lic.notes %}
+                      <p class="text-sm text-slate-600 mt-3 whitespace-pre-line">
+                        {{ lic.notes }}
+                      </p>
+                    {% endif %}
+                  </div>
+
+                  <div class="shrink-0 flex flex-col items-end gap-2">
+                    <a href="{% url 'users:license_delete' lic.id %}"
+                       class="text-sm font-bold text-red-600 hover:text-red-700">
+                      Delete
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+            <div class="text-3xl">🪪</div>
+            <p class="mt-2 text-slate-800 font-extrabold">No licenses yet</p>
+            <p class="text-sm text-slate-500 mt-1">Add your first license using the form.</p>
+          </div>
+        {% endif %}
+      </section>
+
+    </div>
+
+    <p class="text-xs text-slate-500">
+      HandymenHub is a discovery platform. We do not verify tradespeople, facilitate bookings, or provide dispute support.
+    </p>
+
+  </div>
+</div>
+{% endblock %}

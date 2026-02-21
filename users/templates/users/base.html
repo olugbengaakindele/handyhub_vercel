@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <title>{% block title %}LocalTradePros{% endblock %}</title>
+</head>
+
+<body class="min-h-screen bg-slate-100 text-slate-980 flex flex-col">
+
+<!-- NAVBAR -->
+<nav class="bg-slate-900 shadow-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center">
+
+      <!-- Logo -->
+      <a href="{% url 'users:index' %}" class="flex items-center gap-3">
+        <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-400 text-slate-950 font-extrabold shadow">
+          L
+        </span>
+        <div class="leading-tight">
+          <div class="text-lg font-extrabold text-white tracking-tight">LocalTradePros</div>
+          <!-- <div class="hidden sm:block text-[11px] text-white/70">
+            Find skilled local tradespeople and home service professionals. Connect directly.
+          </div> -->
+        </div>
+      </a>
+
+      <!-- CENTER NAV LINKS -->
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <a href="{% url 'users:find_service' %}" class="hover:text-emerald-400 transition">Find a Service</a>
+        <a href="{% url 'contact:contact_us' %}" class="hover:text-emerald-400 transition">Contact Us</a>
+        <a href="{% url 'users:about' %}" class="hover:text-emerald-400 transition">About</a>        
+      </div>
+
+      <!-- RIGHT SIDE -->
+      <div class="relative" >
+
+        {% if user.is_authenticated %}
+          
+          <!-- Username Button -->
+          <button id="userMenuBtn"
+            class="flex items-center gap-2 text-slate-300 font-medium hover:text-emerald-400 transition">
+            <span>{{ user.username }}</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div id="userDropdown" class="absolute right-0 mt-2 w-44 bg-slate-800 text-slate-200 shadow-xl rounded-lg border border-slate-700 hidden">
+
+            <a href="{% url 'users:profile'  %}" class="block px-4 py-2 hover:bg-slate-700">Account</a>
+            <a href="{% url 'users:help_faq'  %}" class="block px-4 py-2 hover:bg-slate-700">Help & FAQs</a>
+            <a href="#" class="block px-4 py-2 hover:bg-slate-700">Support</a>
+            <a href="{% url 'messaging:inbox' %}" class="block px-4 py-2 hover:bg-slate-700">Messages</a>
+
+            {% if user.is_staff %}
+              <a href="{% url 'services:addcategory' %}"
+                class="block px-4 py-2 hover:bg-slate-700">Admin</a>
+
+              <a href="{% url 'services:subcategory' %}"
+                class="block px-4 py-2 hover:bg-slate-700">Sub Category</a>
+            {% endif %}
+
+            <a href="{% url 'users:logout' %}"
+              class="block px-4 py-2 text-red-400 hover:bg-slate-700">Logout</a>
+          </div>
+
+        {% else %}
+
+          <div class="flex items-center gap-6 text-sm font-medium">
+            <a href="{% url 'users:login' %}"
+              class="text-slate-300 hover:text-emerald-400 transition">
+              Sign In
+            </a>
+            <a href="{% url 'users:register' %}"
+              class="inline-flex items-center justify-center bg-emerald-400 text-slate-950 px-4 py-2 rounded-xl hover:bg-emerald-500 transition font-extrabold shadow shadow-emerald-500/20">
+              Create Profile
+            </a>
+          </div>
+
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="flex-1">
+  <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+
+    <!-- MESSAGES -->
+    {% if messages %}
+      <div class="space-y-3 mb-6">
+        {% for message in messages %}
+          <div class="rounded-2xl border px-4 py-3 text-sm shadow-sm
+            {% if message.tags == 'error' %} bg-red-50 border-red-200 text-red-800 {% endif %}
+            {% if message.tags == 'success' %} bg-emerald-50 border-emerald-200 text-emerald-900 {% endif %}
+            {% if message.tags == 'warning' %} bg-yellow-50 border-yellow-200 text-yellow-900 {% endif %}
+            {% if message.tags == 'info' %} bg-sky-50 border-sky-200 text-sky-900 {% endif %}
+          ">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block body %}{% endblock %}
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="border-t border-slate-200 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="grid md:grid-cols-3 gap-8 items-start">
+
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white font-extrabold">
+            L
+          </span>
+          <div>
+            <div class="text-base font-extrabold text-slate-900">LocalTradePros</div>
+            <div class="text-xs text-slate-500 mt-1">
+              Find skilled local tradespeople and home service professionals. Connect directly.
+            </div>
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-500 mt-4 max-w-sm">
+          LocalTradePros is a discovery platform only. We don’t verify professionals, book services, or provide guarantees.
+        </p>
+      </div>
+
+      <div class="md:justify-self-center">
+        <h3 class="text-sm font-extrabold text-slate-900 mb-3">Explore</h3>
+        <ul class="space-y-2 text-sm">
+          <li><a class="text-slate-600 hover:text-emerald-700" href="{% url 'users:find_service' %}">Find a Service</a></li>
+          <li><a class="text-slate-600 hover:text-emerald-700" href="{% url 'users:about' %}">About</a></li>
+          <li><a class="text-slate-600 hover:text-emerald-700" href="{% url 'users:contactus' %}">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="md:justify-self-end">
+        <h3 class="text-sm font-extrabold text-slate-900 mb-3">For professionals</h3>
+        <p class="text-sm text-slate-600 mb-4 max-w-sm">
+          Create a profile to showcase your services and let customers message you directly.
+        </p>
+        {% if not user.is_authenticated %}
+        <a href="{% url 'users:register' %}"
+           class="inline-flex items-center justify-center bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-extrabold hover:bg-emerald-700 transition shadow">
+          Create Profile →
+        </a>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <div class="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-slate-200 pt-6">
+      <p class="text-xs text-slate-500">
+        © {% now "Y" %} LocalTradePros. All rights reserved.
+      </p>
+      <p class="text-xs text-slate-500">
+        Built for Canada • Privacy-friendly • Direct connections
+      </p>
+    </div>
+  </div>
+</footer>
+
+<!-- DROPDOWN SCRIPT -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById('userMenuBtn');
+    const menu = document.getElementById('userDropdown');
+
+    if (btn && menu) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        menu.classList.toggle('hidden');
+      });
+
+      document.addEventListener('click', function (event) {
+        if (!menu.classList.contains('hidden')) {
+          if (!menu.contains(event.target) && !btn.contains(event.target)) {
+            menu.classList.add('hidden');
+          }
+        }
+      });
+    }
+  });
+</script>
+
+</body>
+</html>
