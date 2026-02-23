@@ -37,7 +37,7 @@
 
             <!-- Username / Email -->
             <div>
-                <label class="block text-gray-700 font-medium mb-1" for="id_username">Email</label>
+                <label class="block text-gray-700 font-medium mb-1" for="id_username">Email or Username</label>
                 {{ form.username|add_class:"w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-teal-300 focus:border-teal-500" }}
                 {% if form.username.errors %}
                     <p class="text-red-500 text-sm mt-1">{{ form.username.errors.0 }}</p>
