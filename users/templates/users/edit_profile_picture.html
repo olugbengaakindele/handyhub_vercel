@@ -23,15 +23,14 @@
                 id="avatarPreview"
                 src="{{ profile.user_profile_image.url }}"
                 class="w-32 h-32 rounded-full object-cover border-4 border-emerald-500 transition group-hover:opacity-80"
-                alt="Profile picture"
             />
-            {% else %}
-            <img
+        {% else %}
+            <div
                 id="avatarPreview"
-                src="{% static 'img/no_profile_picture.jpg' %}"
-                class="w-32 h-32 rounded-full object-cover border-4 border-emerald-500 transition group-hover:opacity-80"
-                alt="Default profile picture"
-            />
+                class="w-32 h-32 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 border-4 border-emerald-500"
+            >
+                No Image
+            </div>
         {% endif %}
 
         <span class="absolute bottom-1 right-1 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full">

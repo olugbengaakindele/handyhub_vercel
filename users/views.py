@@ -208,32 +208,20 @@ def delete_user_service(request, service_id):
 
 @login_required
 def edit_profile_picture(request):
-    profile = request.user.profile
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
-        form = ProfilePictureForm(
-            request.POST,
-            request.FILES,
-            instance=profile
-        )
+        form = ProfilePictureForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
-            return redirect("users:profile" )
-        else:
-            messages.error(
-                request,
-                "There was an error updating your profile picture. Please try again."
-            )
-
+            messages.success(request, "Profile picture updated.")
+            return redirect("users:profile")
+        messages.error(request, "There was an error updating your profile picture. Please try again.")
     else:
         form = ProfilePictureForm(instance=profile)
 
-    return render( request,"users/edit_profile_picture.html",
-        {
-            "form": form,
-            "profile": profile
-        }
-    )
+    return render(request, "users/edit_profile_picture.html", {"form": form, "profile": profile})
+
 
 # this edits the contact information
 @login_required
