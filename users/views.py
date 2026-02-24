@@ -267,7 +267,7 @@ def edit_address_info(request):
     return render(request, 'users/edit_address_info.html', {'form': form})
 
 
-
+# contact us page
 def contactus(request):
     return render(request,"users/contactus.html")
 
