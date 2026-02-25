@@ -40,20 +40,19 @@
           Province:
         </label>
 
-        <select id="provinceFilter"
-                class="w-full sm:w-64 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-emerald-300">
+        <select
+          id="provinceFilter"
+          class="w-full sm:w-80 px-4 py-2.5 rounded-xl border border-slate-200 bg-white
+                focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        >
           <option value="ALL">All provinces</option>
-          {# Build from your all_areas list. This works if all_areas has province values. #}
-          {% regroup all_areas by province as provinces %}
-          {% for p in provinces %}
-            <option value="{{ p.grouper }}">{{ p.grouper }}</option>
+
+          {% for prov in distinct_provinces %}
+            <option value="{{ prov }}">{{ prov }}</option>
           {% endfor %}
         </select>
 
-        <button type="button"
-                id="clearProvince"
-                class="text-sm font-semibold text-emerald-700 hover:underline">
+        <button id="clearProvince" class="text-sm text-emerald-700 font-semibold hover:underline">
           Clear
         </button>
       </div>

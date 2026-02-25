@@ -272,63 +272,40 @@ def contactus(request):
     return render(request,"users/contactus.html")
 
 
-
 @login_required
 def edit_service_areas(request):
     user = request.user
     service_area_limit = get_service_area_limit(user)
 
-    # All possible areas (for checkbox selection)
-    all_areas = ServiceArea.objects.filter(is_active=True).order_by("metro_city", "city", "name")
+    all_areas = ServiceArea.objects.filter(is_active=True)\
+        .order_by("metro_city", "city", "name")
 
-    # User's currently selected areas (via reverse relation name in error choices: userservicearea)
-    selected_area_objects = ServiceArea.objects.filter(userservicearea__user=user).order_by("metro_city", "city", "name")
-    selected_ids_current = set(selected_area_objects.values_list("id", flat=True))
+    # ✅ Get distinct provinces directly from DB
+    distinct_provinces = (
+        ServiceArea.objects
+        .filter(is_active=True)
+        .values_list("province", flat=True)
+        .distinct()
+        .order_by("province")
+    )
 
-    if request.method == "POST":
-        selected_ids_post = request.POST.getlist("service_areas")
-        selected_ids_post = [int(x) for x in selected_ids_post if x.isdigit()]
+    selected_area_objects = ServiceArea.objects.filter(
+        userservicearea__user=user
+    ).order_by("metro_city", "city", "name")
 
-        # ✅ Enforce free tier max
-        if len(selected_ids_post) > service_area_limit:
-            messages.error(
-                request,
-                f"Free tier users can only select up to {service_area_limit} service areas."
-            )
-            # Re-render page with current context (don’t save)
-            return render(
-                request,
-                "users/edit_service_areas.html",
-                {
-                    "all_areas": all_areas,
-                    "selected_areas": selected_ids_post,  # show what they tried
-                    "selected_area_objects": selected_area_objects,
-                    "service_area_limit": service_area_limit,
-                },
-            )
+    selected_ids_current = set(
+        selected_area_objects.values_list("id", flat=True)
+    )
 
-        # Save selections: wipe and recreate links
-        with transaction.atomic():
-            UserServiceArea.objects.filter(user=user).delete()
-
-            links = [
-                UserServiceArea(user=user, service_area_id=area_id, is_active=True)
-                for area_id in selected_ids_post
-            ]
-            UserServiceArea.objects.bulk_create(links)
-
-        messages.success(request, "Your service areas have been updated.")
-        return redirect("users:edit_service_areas")
-
-    # GET context
     context = {
         "all_areas": all_areas,
-        "selected_areas": list(selected_ids_current),        # for checkbox checked state
-        "selected_area_objects": selected_area_objects,      # for list below
+        "selected_areas": list(selected_ids_current),
+        "selected_area_objects": selected_area_objects,
         "service_area_limit": service_area_limit,
+        "distinct_provinces": distinct_provinces,   # 👈 ADD THIS
     }
-    return render(request, "users/edit_service_areas.html", context)
 
+    return render(request, "users/edit_service_areas.html", context)
 
 @login_required
 def delete_service_area_confirm(request, area_id):
