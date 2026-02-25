@@ -7,52 +7,48 @@ class ServiceAreaSelector {
     this.countEl = document.querySelector(config.countSelector);
     this.limitEl = document.querySelector(config.limitSelector);
 
-    this.checkboxSelector = config.checkboxSelector;
-    this.cardSelector = config.cardSelector;
-    this.groupSelector = config.groupSelector;
-
     this.limit = Number(config.limit || 0);
 
-    if (!this.container || !this.provinceSelect || !this.countEl || !this.limitEl) {
-      return; // fail silently if markup isn't present
-    }
+    if (!this.container || !this.provinceSelect || !this.countEl || !this.limitEl) return;
 
-    this.checkboxes = Array.from(this.container.querySelectorAll(this.checkboxSelector));
-    this.cards = Array.from(this.container.querySelectorAll(this.cardSelector));
+    // ✅ Failsafe selectors (works even if classes are missing)
+    this.cardSelector = config.cardSelector || "label";
+    this.checkboxSelector = config.checkboxSelector || 'input[type="checkbox"]';
+    this.groupSelector = config.groupSelector || ".metro-group";
+
+    this.cards = Array.from(this.container.querySelectorAll(this.cardSelector))
+      .filter(el => el.querySelector(this.checkboxSelector)); // only labels/cards that contain a checkbox
+
+    this.checkboxes = this.cards
+      .map(card => card.querySelector(this.checkboxSelector))
+      .filter(Boolean);
+
     this.groups = Array.from(this.container.querySelectorAll(this.groupSelector));
 
     this.bindEvents();
-
-    // Initial paint
-    this.updateCountUI();
-    this.applyProvinceFilter(this.provinceSelect.value);
-    this.applyLimitRules();
+    this.refresh();
   }
 
   bindEvents() {
-    // Checkbox changes
-    this.checkboxes.forEach((cb) => {
-      cb.addEventListener("change", () => {
-        this.updateCountUI();
-        this.applyLimitRules();
-      });
+    this.checkboxes.forEach(cb => {
+      cb.addEventListener("change", () => this.refresh());
     });
 
-    // Province filter
-    this.provinceSelect.addEventListener("change", () => {
-      this.applyProvinceFilter(this.provinceSelect.value);
-      this.applyLimitRules(); // re-apply disable styles to visible cards
-    });
+    this.provinceSelect.addEventListener("change", () => this.refresh());
 
-    // Clear filter (optional)
     if (this.clearBtn) {
       this.clearBtn.addEventListener("click", (e) => {
         e.preventDefault();
         this.provinceSelect.value = "ALL";
-        this.applyProvinceFilter("ALL");
-        this.applyLimitRules();
+        this.refresh();
       });
     }
+  }
+
+  refresh() {
+    this.updateCountUI();
+    this.applyProvinceFilter(this.provinceSelect.value);
+    this.applyLimitRules();
   }
 
   getSelectedCount() {
@@ -65,93 +61,75 @@ class ServiceAreaSelector {
     this.limitEl.textContent = String(this.limit);
   }
 
-  /**
-   * Disable/grey out unchecked items when limit is reached.
-   * IMPORTANT: enforce across ALL items (not just visible),
-   * so if user changes province filter, the rules remain correct.
-   */
+  // ✅ Get province for a card safely
+  getCardProvince(card) {
+    // Preferred: data-province
+    const dp = (card.getAttribute("data-province") || "").trim();
+    if (dp) return dp;
+
+    // Fallback: try to parse "City, MB" from the small text
+    const text = (card.innerText || "").trim();
+    const match = text.match(/,\s*([A-Z]{2})\b/); // finds ", MB"
+    return match ? match[1] : "";
+  }
+
+  applyProvinceFilter(provinceValue) {
+    const isAll = provinceValue === "ALL";
+
+    this.cards.forEach(card => {
+      const prov = this.getCardProvince(card);
+      const matches = isAll || prov === provinceValue;
+
+      card.classList.toggle("hidden", !matches);
+    });
+
+    // hide metro groups with zero visible cards
+    this.groups.forEach(group => {
+      const visible = group.querySelectorAll(`${this.cardSelector}:not(.hidden)`);
+      group.classList.toggle("hidden", visible.length === 0);
+    });
+  }
+
   applyLimitRules() {
     const selectedCount = this.getSelectedCount();
     const limitReached = selectedCount >= this.limit;
 
-    this.cards.forEach((card) => {
+    this.cards.forEach(card => {
       const cb = card.querySelector(this.checkboxSelector);
       if (!cb) return;
 
-      // When limit is reached, disable unchecked
-      if (limitReached && !cb.checked) {
-        this.disableCard(card, cb);
+      const isHidden = card.classList.contains("hidden");
+      const shouldDisable = !isHidden && limitReached && !cb.checked;
+
+      cb.disabled = shouldDisable;
+
+      card.classList.toggle("opacity-50", shouldDisable);
+      card.classList.toggle("cursor-not-allowed", shouldDisable);
+
+      // optional: tone down hover when disabled
+      if (shouldDisable) {
+        card.classList.remove("hover:bg-emerald-50", "hover:border-emerald-400");
       } else {
-        this.enableCard(card, cb);
-      }
-    });
-  }
-
-  disableCard(card, cb) {
-    cb.disabled = true;
-
-    // Visual grey-out (do NOT block pointer events on the label, because that can block unchecking in some browsers)
-    card.classList.add("opacity-50");
-    card.classList.add("cursor-not-allowed");
-
-    // Optional: reduce hover
-    card.classList.remove("hover:bg-emerald-50", "hover:border-emerald-400");
-  }
-
-  enableCard(card, cb) {
-    cb.disabled = false;
-    card.classList.remove("opacity-50", "cursor-not-allowed");
-
-    // Restore hover styles (if you use them)
-    card.classList.add("hover:bg-emerald-50", "hover:border-emerald-400");
-  }
-
-  /**
-   * Filters by province by hiding cards.
-   * Also hides metro groups that have no visible cards.
-   */
-  applyProvinceFilter(provinceValue) {
-    const isAll = provinceValue === "ALL";
-
-    this.cards.forEach((card) => {
-      const cardProvince = (card.getAttribute("data-province") || "").trim();
-      const matches = isAll || cardProvince === provinceValue;
-
-      if (matches) {
-        card.classList.remove("hidden");
-      } else {
-        card.classList.add("hidden");
-      }
-    });
-
-    // Hide groups with zero visible cards
-    this.groups.forEach((group) => {
-      const visibleCards = group.querySelectorAll(`${this.cardSelector}:not(.hidden)`);
-      if (visibleCards.length === 0) {
-        group.classList.add("hidden");
-      } else {
-        group.classList.remove("hidden");
+        card.classList.add("hover:bg-emerald-50", "hover:border-emerald-400");
       }
     });
   }
 }
 
-// Boot
 document.addEventListener("DOMContentLoaded", () => {
-  // Read limit from script tag dataset (recommended)
   const scriptTag = document.querySelector('script[src*="edit_service_areas.js"]');
-  const limitFromData = scriptTag?.dataset?.limit;
-  const limit = Number(limitFromData || 5);
+  const limit = Number(scriptTag?.dataset?.limit || 5);
 
   new ServiceAreaSelector({
-    containerSelector: "#areasContainer",          // ✅ matches your template ID
+    containerSelector: "#areasContainer",
     provinceSelectSelector: "#provinceFilter",
-    clearBtnSelector: "#clearProvince",            // optional button id
+    clearBtnSelector: "#clearProvince",
     countSelector: "#selectedCount",
-    limitSelector: "#maxCount",                    // ✅ matches your template ID
+    limitSelector: "#maxCount",
+    // If your template uses these classes, keep them. If not, it will still work.
     checkboxSelector: ".area-checkbox",
     cardSelector: ".area-card",
     groupSelector: ".metro-group",
-    limit: limit,
+    limit,
   });
 });

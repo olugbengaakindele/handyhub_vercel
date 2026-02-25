@@ -25,11 +25,12 @@
           </p>
         </div>
 
+        <!-- ✅ IDs must match JS -->
         <div class="rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3">
           <p class="text-sm text-slate-700">
             Selected:
             <span id="selectedCount" class="font-bold text-emerald-700">{{ selected_area_objects|length }}</span>
-            / <span id="limitCount">{{ service_area_limit }}</span>
+            / <span id="maxCount">{{ service_area_limit }}</span>
           </p>
         </div>
       </div>
@@ -46,13 +47,17 @@
                 focus:outline-none focus:ring-2 focus:ring-emerald-500"
         >
           <option value="ALL">All provinces</option>
-
           {% for prov in distinct_provinces %}
             <option value="{{ prov }}">{{ prov }}</option>
           {% endfor %}
         </select>
 
-        <button id="clearProvince" class="text-sm text-emerald-700 font-semibold hover:underline">
+        <!-- ✅ ensure it doesn't submit the form -->
+        <button
+          id="clearProvince"
+          type="button"
+          class="text-sm text-emerald-700 font-semibold hover:underline"
+        >
           Clear
         </button>
       </div>
@@ -60,11 +65,12 @@
       <form method="POST">
         {% csrf_token %}
 
-        <div id="serviceAreasContainer" class="space-y-6 max-h-[420px] overflow-y-auto pr-2">
+        <!-- ✅ ID must match JS -->
+        <div id="areasContainer" class="space-y-6 max-h-[420px] overflow-y-auto pr-2">
           {% regroup all_areas by metro_city as grouped_areas %}
 
           {% for group in grouped_areas %}
-            <div class="metro-group" data-metro="{{ group.grouper }}">
+            <div class="metro-group" data-metro="{{ group.grouper|escape }}">
               <div class="flex items-center justify-between mb-2">
                 <h3 class="font-bold text-emerald-700">{{ group.grouper }}</h3>
                 <span class="text-xs text-slate-400">Choose areas you serve</span>
@@ -75,7 +81,6 @@
                   <label
                     class="area-card flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer hover:border-emerald-400 hover:bg-emerald-50 transition"
                     data-province="{{ area.province }}"
-                    data-area-card
                   >
                     <input
                       type="checkbox"
@@ -83,7 +88,6 @@
                       value="{{ area.id }}"
                       {% if area.id in selected_areas %}checked{% endif %}
                       class="area-checkbox accent-emerald-600 w-4 h-4"
-                      data-area-checkbox
                     />
                     <div class="min-w-0">
                       <p class="text-sm font-bold text-slate-800 truncate">{{ area.name }}</p>
@@ -110,18 +114,15 @@
         </p>
       </form>
 
-      <!-- Existing list unchanged... -->
-      <!-- (keep your current “Your Current Service Areas” section as-is) -->
-
+      <!-- keep your current “Your Current Service Areas” section below unchanged -->
     </div>
   </div>
 </div>
 
-<!-- External JS -->
+<!-- ✅ External JS: file + dataset must match JS -->
 <script
-  src="{% static 'users/js/service_area_selector.js' %}"
-  defer
-  data-service-area-limit="{{ service_area_limit }}"
+  src="{% static 'users/js/edit_service_areas.js' %}"
+  data-limit="{{ service_area_limit }}"
 ></script>
 
 {% endblock %}
