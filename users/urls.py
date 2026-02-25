@@ -97,4 +97,6 @@ urlpatterns = [
     
     #  delete accoutn
     path("account/delete/", views.delete_account, name="delete_account"),
+
+    path("post-login/", views.post_login, name="post_login"),
 ]

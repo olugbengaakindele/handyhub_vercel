@@ -704,3 +704,40 @@ def delete_account(request):
         form = DeleteAccountForm()
 
     return render(request, "users/account_delete_confirm.html", {"form": form})
+
+
+# this redirect a newly created profile to complete profile info
+@login_required
+def post_login(request):
+    # Ensure profile exists
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+    # Only guide tradespeople
+    if profile.account_type != UserProfile.TYPE_TRADESPERSON:
+        return redirect("users:index")
+
+    # Determine what’s missing (basic)
+    missing = []
+
+    # photo: detect default
+    if not profile.user_profile_image or str(profile.user_profile_image).endswith("no_profile_picture.jpg"):
+        missing.append("photo")
+
+    if not (profile.profile_summary and profile.profile_summary.strip()):
+        missing.append("summary")
+
+    if not request.user.services.exists():
+        missing.append("services")
+
+    if not request.user.user_service_areas.filter(is_active=True).exists():
+        missing.append("areas")
+
+ 
+    if "summary" in missing:
+        return redirect("users:edit_profile")  # if summary is edited there; otherwise change to edit_contact_info
+    if "services" in missing:
+        return redirect("users:userservice")
+    if "areas" in missing:
+        return redirect("users:edit_service_areas")
+
+    return redirect("users:profile")

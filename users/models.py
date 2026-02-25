@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from .utils import get_gallery_max_upload_bytes
 from django.utils import timezone
-
+from django.templatetags.static import static
 
 User = get_user_model()
 
@@ -107,6 +107,56 @@ class UserProfile(models.Model):
     user_created_at = models.DateTimeField(auto_now_add=True)
     user_updated_at = models.DateTimeField(auto_now=True)
     last_seen_at = models.DateTimeField(null=True, blank=True, default=timezone.now)
+
+
+    def has_custom_profile_image(self) -> bool:
+        # If you keep default="no_profile_picture.jpg"
+        if not self.user_profile_image:
+            return False
+        try:
+            return not self.user_profile_image.name.endswith("no_profile_picture.jpg")
+        except Exception:
+            return False
+
+    def missing_setup_items(self):
+        """
+        Returns a list of dicts describing what the user still needs to do.
+        """
+        missing = []
+
+        if not self.has_custom_profile_image():
+            missing.append({"key": "photo", "label": "Add a profile photo", "url_name": "users:edit_profile_picture"})
+
+        if not (self.profile_summary and self.profile_summary.strip()):
+            missing.append({"key": "bio", "label": "Add a short profile summary", "url_name": "users:edit_contact_info"})  # or whichever view edits summary
+
+        if not self.user.services.exists():
+            missing.append({"key": "services", "label": "Add your services", "url_name": "users:userservice"})
+
+        if not self.user.user_service_areas.filter(is_active=True).exists():
+            missing.append({"key": "areas", "label": "Add your service areas", "url_name": "users:edit_service_areas"})  # adjust to your real url name
+
+        # optional nudges
+        if not (self.user_business_name and self.user_business_name.strip()):
+            missing.append({"key": "biz", "label": "Add your business name", "url_name": "users:edit_contact_info"})
+
+        if not (self.user_primary_phone and self.user_primary_phone.strip()):
+            missing.append({"key": "phone", "label": "Add a phone number", "url_name": "users:edit_contact_info"})
+
+        return missing
+
+    def completion_percent(self) -> int:
+        # Choose what counts as “done”
+        checks = [
+            self.has_custom_profile_image(),
+            bool(self.profile_summary and self.profile_summary.strip()),
+            self.user.services.exists(),
+            self.user.user_service_areas.filter(is_active=True).exists(),
+        ]
+        done = sum(1 for c in checks if c)
+        total = len(checks)
+        return int((done / total) * 100) if total else 0
+
 
     def __str__(self):
         return f"{self.user_preferred_name or self.user_firstname}"

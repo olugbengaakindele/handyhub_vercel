@@ -66,7 +66,6 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
-
 # Internationalization
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
@@ -84,5 +83,5 @@ MEDIA_URL = "/profile_picture/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Auth redirects
-LOGIN_REDIRECT_URL = "users:index"
+LOGIN_REDIRECT_URL = "users:post_login"
 LOGIN_URL = "users:login"
