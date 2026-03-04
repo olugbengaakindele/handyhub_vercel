@@ -277,10 +277,28 @@ def edit_service_areas(request):
     user = request.user
     service_area_limit = get_service_area_limit(user)
 
-    all_areas = ServiceArea.objects.filter(is_active=True)\
-        .order_by("metro_city", "city", "name")
+    # ✅ Handle POST: Save selected service areas
+    if request.method == "POST":
+        selected_ids = request.POST.getlist("service_areas")  # ✅ MUST be getlist for checkboxes
 
-    # ✅ Get distinct provinces directly from DB
+        # Server-side limit enforcement
+        if len(selected_ids) > service_area_limit:
+            messages.error(request, f"You can only select up to {service_area_limit} service areas.")
+            return redirect("users:edit_service_areas")
+
+        # Replace selections (simple + reliable)
+        UserServiceArea.objects.filter(user=user).delete()
+        UserServiceArea.objects.bulk_create([
+            UserServiceArea(user=user, service_area_id=int(area_id))
+            for area_id in selected_ids
+        ])
+
+        messages.success(request, "Service areas saved successfully.")
+        return redirect("users:edit_service_areas")  # or redirect("users:profile")
+
+    # ✅ GET: render page
+    all_areas = ServiceArea.objects.filter(is_active=True).order_by("metro_city", "city", "name")
+
     distinct_provinces = (
         ServiceArea.objects
         .filter(is_active=True)
@@ -293,16 +311,14 @@ def edit_service_areas(request):
         userservicearea__user=user
     ).order_by("metro_city", "city", "name")
 
-    selected_ids_current = set(
-        selected_area_objects.values_list("id", flat=True)
-    )
+    selected_ids_current = set(selected_area_objects.values_list("id", flat=True))
 
     context = {
         "all_areas": all_areas,
-        "selected_areas": list(selected_ids_current),
+        "selected_areas": list(selected_ids_current),  # used by template checked logic
         "selected_area_objects": selected_area_objects,
         "service_area_limit": service_area_limit,
-        "distinct_provinces": distinct_provinces,   # 👈 ADD THIS
+        "distinct_provinces": distinct_provinces,
     }
 
     return render(request, "users/edit_service_areas.html", context)

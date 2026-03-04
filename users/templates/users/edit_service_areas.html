@@ -62,7 +62,7 @@
         </button>
       </div>
 
-      <form method="POST">
+      <form method="POST" action="{% url 'users:edit_service_areas' %}">
         {% csrf_token %}
 
         <!-- ✅ ID must match JS -->
