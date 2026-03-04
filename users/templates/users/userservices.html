@@ -15,26 +15,34 @@
         ← Back to Profile
       </a>
     </div>
+
     <!-- Header -->
     <div class="text-center mb-12">
       <div class="text-5xl mb-3 text-emerald-600">🛠️</div>
-      <h2 class="text-3xl font-extrabold text-slate-800">
-        Manage Your Services
-      </h2>
-      <p class="text-slate-500 mt-2">
-        Add new services or manage existing ones
-      </p>
+      <h2 class="text-3xl font-extrabold text-slate-800">Manage Your Services</h2>
+      <p class="text-slate-500 mt-2">Add new services or manage existing ones</p>
     </div>
 
     <!-- ===================== -->
     <!-- ADD NEW SERVICES -->
     <!-- ===================== -->
     <div class="mb-14">
-      <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-        <span class="text-emerald-600">➕</span> Add Services
-      </h3>
+      <div class="flex items-start justify-between gap-6 mb-4">
+        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <span class="text-emerald-600">➕</span> Add Services
+        </h3>
 
-      <form method="POST" class="space-y-8">
+        <!-- Counter badge (like service areas) -->
+        <div class="rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3">
+          <p class="text-sm text-slate-700">
+            Selected:
+            <span id="selectedServiceCount" class="font-bold text-emerald-700">0</span>
+            / <span id="maxServiceCount">{{ service_limit|default:10 }}</span>
+          </p>
+        </div>
+      </div>
+
+      <form id="userServicesForm" method="POST" class="space-y-8">
         {% csrf_token %}
 
         <!-- Category -->
@@ -43,55 +51,68 @@
             Service Category
           </label>
 
-          <select name="category" id="categorySelect"
-                  class="w-full p-3 border border-slate-300 rounded-xl bg-white
-                         focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          <select
+            name="category"
+            id="categorySelect"
+            class="w-full p-3 border border-slate-300 rounded-xl bg-white
+                   focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          >
             <option value="">-- Select a Category --</option>
             {% for category in categories %}
-              <option value="{{ category.id }}">
-                {{ category.name }}
-              </option>
+              <option value="{{ category.id }}">{{ category.name }}</option>
             {% endfor %}
           </select>
+
+          <p class="text-xs text-slate-500 mt-2">
+            Tip: Pick a category to view its sub-services.
+          </p>
         </div>
 
         <!-- Subcategories -->
-        {% for category in categories %}
-        <div class="subcategory-group hidden"
-             data-category="{{ category.id }}">
+        <div id="subcategoryContainer" class="space-y-5">
+          {% for category in categories %}
+            <div class="subcategory-group hidden" data-category="{{ category.id }}">
+              <div class="border border-slate-200 rounded-xl p-6 bg-slate-50">
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-lg font-bold text-slate-800">
+                    {{ category.name }} Services
+                  </h4>
 
-          <div class="border border-slate-200 rounded-xl p-6 bg-slate-50">
-            <h4 class="text-lg font-bold text-slate-800 mb-4">
-              {{ category.name }} Services
-            </h4>
+                  <span class="text-xs text-slate-500">
+                    Choose services you offer
+                  </span>
+                </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {% for sub in category.subcategories.all %}
-              <label
-                class="flex items-center gap-3 p-3 bg-white border border-slate-200
-                       rounded-lg cursor-pointer transition
-                       hover:border-emerald-400 hover:bg-emerald-50">
-
-                <input type="checkbox"
-                       name="services"
-                       value="{{ sub.id }}"
-                       class="h-5 w-5 rounded border-slate-300 text-emerald-600
-                              focus:ring-emerald-500">
-
-                <span class="text-slate-700 font-medium">
-                  {{ sub.name }}
-                </span>
-              </label>
-              {% endfor %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {% for sub in category.subcategories.all %}
+                    <label
+                      class="service-card flex items-center gap-3 p-3 bg-white border border-slate-200
+                             rounded-lg cursor-pointer transition
+                             hover:border-emerald-400 hover:bg-emerald-50"
+                      data-category="{{ category.id }}"
+                    >
+                      <input
+                        type="checkbox"
+                        name="services"
+                        value="{{ sub.id }}"
+                        class="service-checkbox h-5 w-5 rounded border-slate-300 text-emerald-600
+                               focus:ring-emerald-500"
+                      >
+                      <span class="text-slate-700 font-medium">{{ sub.name }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
+              </div>
             </div>
-          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
 
-        <button type="submit"
-                class="w-full bg-emerald-600 text-white py-3 rounded-xl
-                       font-semibold shadow-md transition
-                       hover:bg-emerald-700 active:bg-emerald-800">
+        <button
+          type="submit"
+          class="w-full bg-emerald-600 text-white py-3 rounded-xl
+                 font-semibold shadow-md transition
+                 hover:bg-emerald-700 active:bg-emerald-800"
+        >
           💾 Save Services
         </button>
       </form>
@@ -106,53 +127,33 @@
       </h3>
 
       {% if user_services %}
-      <div class="space-y-3">
-        {% for service in user_services %}
-        <div
-          class="flex justify-between items-center p-4 bg-slate-50
-                 border border-slate-200 rounded-xl">
+        <div class="space-y-3">
+          {% for service in user_services %}
+            <div class="flex justify-between items-center p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <div>
+                <p class="font-semibold text-slate-800">{{ service.category.name }}</p>
+                <p class="text-sm text-slate-600">{{ service.subcategory.name }}</p>
+              </div>
 
-          <div>
-            <p class="font-semibold text-slate-800">
-              {{ service.category.name }}
-            </p>
-            <p class="text-sm text-slate-600">
-              {{ service.subcategory.name }}
-            </p>
-          </div>
-
-          <!-- DELETE -->
-          <a href="{% url 'users:delete_user_service' service.id %}"
-            class="flex items-center gap-2 text-red-600 font-semibold
-                    hover:text-red-700 transition">
-            🗑️ Delete
-          </a>
+              <a href="{% url 'users:delete_user_service' service.id %}"
+                class="flex items-center gap-2 text-red-600 font-semibold hover:text-red-700 transition">
+                🗑️ Delete
+              </a>
+            </div>
+          {% endfor %}
         </div>
-        {% endfor %}
-      </div>
       {% else %}
-      <p class="text-slate-500 italic">
-        You haven’t added any services yet.
-      </p>
+        <p class="text-slate-500 italic">You haven’t added any services yet.</p>
       {% endif %}
     </div>
 
   </div>
 </div>
 
-<!-- JS -->
-<script>
-  const categorySelect = document.getElementById("categorySelect");
-  const groups = document.querySelectorAll(".subcategory-group");
-
-  categorySelect.addEventListener("change", function () {
-    groups.forEach(group => {
-      group.classList.add("hidden");
-      if (group.dataset.category === this.value) {
-        group.classList.remove("hidden");
-      }
-    });
-  });
-</script>
+<!-- ✅ External JS (own file like service areas) -->
+<script
+  src="{% static 'users/js/user_services_selector.js' %}"
+  data-limit="{{ service_limit|default:10 }}"
+></script>
 
 {% endblock %}
