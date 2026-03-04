@@ -130,12 +130,12 @@ def add_user_services(request):
         category = get_object_or_404(ServiceCategory, id=category_id)
 
         existing_count = user.services.count()
-        remaining_slots = 5 - existing_count
+        remaining_slots = 10 - existing_count
 
         if remaining_slots <= 0:
             messages.error(
                 request,
-                "You have already added the maximum of 5 services."
+                "You have already added the maximum of 10 services."
             )
             return redirect("users:profile")
 
