@@ -1,3 +1,4 @@
+{# templates/users/edit_service_areas.html #}
 {% extends "./base.html" %}
 {% load static %}
 {% block body %}
@@ -25,7 +26,7 @@
           </p>
         </div>
 
-        <!-- ✅ IDs must match JS -->
+        <!-- Counter -->
         <div class="rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3">
           <p class="text-sm text-slate-700">
             Selected:
@@ -52,7 +53,6 @@
           {% endfor %}
         </select>
 
-        <!-- ✅ ensure it doesn't submit the form -->
         <button
           id="clearProvince"
           type="button"
@@ -62,10 +62,10 @@
         </button>
       </div>
 
+      <!-- Form -->
       <form method="POST" action="{% url 'users:edit_service_areas' %}">
         {% csrf_token %}
 
-        <!-- ✅ ID must match JS -->
         <div id="areasContainer" class="space-y-6 max-h-[420px] overflow-y-auto pr-2">
           {% regroup all_areas by metro_city as grouped_areas %}
 
@@ -81,6 +81,10 @@
                   <label
                     class="area-card flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 cursor-pointer hover:border-emerald-400 hover:bg-emerald-50 transition"
                     data-province="{{ area.province }}"
+                    data-area-id="{{ area.id }}"
+                    data-area-name="{{ area.name|escape }}"
+                    data-city="{{ area.city|escape }}"
+                    data-metro="{{ area.metro_city|escape }}"
                   >
                     <input
                       type="checkbox"
@@ -114,12 +118,41 @@
         </p>
       </form>
 
-      <!-- keep your current “Your Current Service Areas” section below unchanged -->
+      <!-- Current selections panel (JS will keep it in sync) -->
+      <div class="mt-10 border-t pt-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-bold text-slate-800">Your Current Service Areas</h3>
+          <span id="currentAreasCount" class="text-xs text-slate-500">
+            {{ selected_area_objects|length }} selected
+          </span>
+        </div>
+
+        <div id="currentAreasBox" class="space-y-3">
+          {% if selected_area_objects %}
+            {% for a in selected_area_objects %}
+              <div class="flex items-center justify-between bg-white border border-slate-200 rounded-xl px-4 py-3">
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold text-slate-800 truncate">{{ a.name }}</p>
+                  <p class="text-xs text-slate-500 truncate">{{ a.city }}, {{ a.province }} • {{ a.metro_city }}</p>
+                </div>
+                <span class="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg">
+                  Selected
+                </span>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-xl px-4 py-4">
+              No service areas selected yet.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
-<!-- ✅ External JS: file + dataset must match JS -->
+<!-- External JS -->
 <script
   src="{% static 'users/js/service_area_selector.js' %}"
   data-limit="{{ service_area_limit }}"
