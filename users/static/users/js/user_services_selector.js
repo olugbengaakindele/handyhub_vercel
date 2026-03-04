@@ -1,39 +1,38 @@
 // static/users/js/user_services_selector.js
 
 class UserServicesSelector {
-  constructor(config) {
-    this.form = document.querySelector(config.formSelector);
-    this.categorySelect = document.querySelector(config.categorySelectSelector);
-    this.groups = Array.from(document.querySelectorAll(config.groupSelector));
+  constructor() {
+    this.form = document.querySelector("#userServicesForm");
+    this.categorySelect = document.querySelector("#categorySelect");
+    this.groups = Array.from(document.querySelectorAll(".subcategory-group"));
 
-    this.countEl = document.querySelector(config.countSelector);
-    this.limitEl = document.querySelector(config.limitSelector);
+    this.badge = document.querySelector("#serviceCounterBadge");
+    this.countEl = document.querySelector("#selectedServiceCount");
+    this.limitEl = document.querySelector("#maxServiceCount");
 
-    this.cardSelector = config.cardSelector || ".service-card";
-    this.checkboxSelector = config.checkboxSelector || ".service-checkbox";
+    const scriptTag = document.querySelector('script[src*="user_services_selector.js"]');
+    this.limit = Number(scriptTag?.dataset?.limit || 10);
 
-    const scriptTag = document.querySelector(config.scriptSelector);
-    this.limit = Number(scriptTag?.dataset?.limit || config.limit || 10);
+    // base (existing services)
+    this.existingCount = Number(this.badge?.dataset?.existingCount || 0);
 
     if (!this.form || !this.categorySelect || !this.countEl || !this.limitEl) return;
 
     this.limitEl.textContent = String(this.limit);
 
     this.bindEvents();
-    this.refresh(); // first paint
+    this.refresh();
   }
 
   bindEvents() {
-    // Category change
     this.categorySelect.addEventListener("change", () => {
       this.showSelectedCategoryGroup();
       this.refresh();
     });
 
-    // Checkbox changes (event delegation)
+    // Event delegation: any checkbox change
     this.form.addEventListener("change", (e) => {
-      const cb = e.target;
-      if (cb && cb.matches(this.checkboxSelector)) {
+      if (e.target && e.target.matches(".service-checkbox")) {
         this.refresh();
       }
     });
@@ -55,23 +54,27 @@ class UserServicesSelector {
     const group = this.groups.find(g => g.dataset.category === selectedCat);
     if (!group) return [];
 
-    return Array.from(group.querySelectorAll(this.checkboxSelector));
+    return Array.from(group.querySelectorAll(".service-checkbox"));
   }
 
   getVisibleSelectedCount() {
     return this.getVisibleCheckboxes().reduce((acc, cb) => acc + (cb.checked ? 1 : 0), 0);
   }
 
-  applyLimitRules() {
-    const checkboxes = this.getVisibleCheckboxes();
-    const selectedCount = this.getVisibleSelectedCount();
-    const limitReached = selectedCount >= this.limit;
+  getTotalSelectedCount() {
+    return this.existingCount + this.getVisibleSelectedCount();
+  }
 
-    checkboxes.forEach(cb => {
+  applyLimitRules() {
+    const visibleCheckboxes = this.getVisibleCheckboxes();
+    const totalSelected = this.getTotalSelectedCount();
+    const limitReached = totalSelected >= this.limit;
+
+    visibleCheckboxes.forEach(cb => {
       const shouldDisable = limitReached && !cb.checked;
       cb.disabled = shouldDisable;
 
-      const card = cb.closest(this.cardSelector);
+      const card = cb.closest(".service-card");
       if (!card) return;
 
       card.classList.toggle("opacity-50", shouldDisable);
@@ -86,14 +89,14 @@ class UserServicesSelector {
   }
 
   refresh() {
-    // Always ensure correct group is shown
+    // ensure right group is shown
     this.showSelectedCategoryGroup();
 
-    // Count only visible category checkboxes
-    const selectedCount = this.getVisibleSelectedCount();
-    this.countEl.textContent = String(selectedCount);
+    // update counter (existing + new)
+    const totalSelected = this.getTotalSelectedCount();
+    this.countEl.textContent = String(totalSelected);
 
-    // Apply limit rules only when a category is selected
+    // enforce limit when category selected
     if (this.categorySelect.value) {
       this.applyLimitRules();
     }
@@ -101,15 +104,5 @@ class UserServicesSelector {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  new UserServicesSelector({
-    formSelector: "#userServicesForm",
-    categorySelectSelector: "#categorySelect",
-    groupSelector: ".subcategory-group",
-    countSelector: "#selectedServiceCount",
-    limitSelector: "#maxServiceCount",
-    scriptSelector: 'script[src*="user_services_selector.js"]',
-    checkboxSelector: ".service-checkbox",
-    cardSelector: ".service-card",
-    limit: 10,
-  });
+  new UserServicesSelector();
 });

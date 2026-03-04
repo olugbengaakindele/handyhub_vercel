@@ -32,12 +32,19 @@
           <span class="text-emerald-600">➕</span> Add Services
         </h3>
 
-        <!-- Counter badge (like service areas) -->
-        <div class="rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3">
+        <!-- Counter badge -->
+        <div
+          id="serviceCounterBadge"
+          class="rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3"
+          data-existing-count="{{ user_services|length }}"
+        >
           <p class="text-sm text-slate-700">
             Selected:
-            <span id="selectedServiceCount" class="font-bold text-emerald-700">0</span>
+            <span id="selectedServiceCount" class="font-bold text-emerald-700">{{ user_services|length }}</span>
             / <span id="maxServiceCount">{{ service_limit|default:10 }}</span>
+          </p>
+          <p class="text-[11px] text-slate-500 mt-1">
+            (includes your current services)
           </p>
         </div>
       </div>
@@ -77,10 +84,7 @@
                   <h4 class="text-lg font-bold text-slate-800">
                     {{ category.name }} Services
                   </h4>
-
-                  <span class="text-xs text-slate-500">
-                    Choose services you offer
-                  </span>
+                  <span class="text-xs text-slate-500">Choose services you offer</span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -89,7 +93,6 @@
                       class="service-card flex items-center gap-3 p-3 bg-white border border-slate-200
                              rounded-lg cursor-pointer transition
                              hover:border-emerald-400 hover:bg-emerald-50"
-                      data-category="{{ category.id }}"
                     >
                       <input
                         type="checkbox"
@@ -150,7 +153,7 @@
   </div>
 </div>
 
-<!-- ✅ External JS (own file like service areas) -->
+<!-- External JS -->
 <script
   src="{% static 'users/js/user_services_selector.js' %}"
   data-limit="{{ service_limit|default:10 }}"
