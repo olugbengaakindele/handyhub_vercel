@@ -14,7 +14,7 @@
           <div>
             <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Find a Service</h1>
             <p class="text-white/80 mt-2 max-w-2xl">
-              Choose a category, optional subcategory, and city to find available tradespeople.
+              Choose a category, optional subcategory, province, and city to find available tradespeople.
             </p>
             <p class="text-xs text-white/70 mt-3">
               Platform only — we don’t verify tradespeople or book services.
@@ -35,7 +35,7 @@
       <div class="flex items-center justify-between gap-4 mb-6">
         <h2 class="text-xl font-extrabold text-slate-900">Search filters</h2>
 
-        {% if selected_category or selected_subcategory or selected_city %}
+        {% if selected_category or selected_subcategory or selected_province or selected_city %}
           <a href="{% url 'users:find_service' %}"
              class="text-sm font-semibold text-emerald-700 hover:underline">
             Reset
@@ -43,7 +43,7 @@
         {% endif %}
       </div>
 
-      <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
         <!-- Category -->
         <div>
@@ -94,17 +94,18 @@
           </div>
         </div>
 
-        <!-- City -->
+        <!-- Province -->
         <div>
-          <label for="citySelect" class="block text-sm font-semibold text-slate-700 mb-2">City</label>
+          <label for="provinceSelect" class="block text-sm font-semibold text-slate-700 mb-2">Province</label>
           <div class="relative">
-            <select id="citySelect" name="city"
+            <select id="provinceSelect" name="province"
                     class="appearance-none w-full rounded-xl border border-slate-300 bg-white px-4 py-3 pr-10 text-slate-900
                            focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400">
-              <option value="">All cities</option>
-              {% for city in cities %}
-                <option value="{{ city }}" {% if selected_city and selected_city == city %}selected{% endif %}>
-                  {{ city }}
+              <option value="">All provinces</option>
+              {% for province in provinces %}
+                <option value="{{ province }}"
+                        {% if selected_province and selected_province == province %}selected{% endif %}>
+                  {{ province }}
                 </option>
               {% endfor %}
             </select>
@@ -116,7 +117,31 @@
           </div>
         </div>
 
-        <div class="md:col-span-3 flex justify-end gap-3 pt-2">
+        <!-- City -->
+        <div>
+          <label for="citySelect" class="block text-sm font-semibold text-slate-700 mb-2">City</label>
+          <div class="relative">
+            <select id="citySelect" name="city"
+                    class="appearance-none w-full rounded-xl border border-slate-300 bg-white px-4 py-3 pr-10 text-slate-900
+                           focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400">
+              <option value="">All cities</option>
+              {% for city in cities %}
+                <option value="{{ city.name }}"
+                        data-province="{{ city.province }}"
+                        {% if selected_city and selected_city == city.name %}selected{% endif %}>
+                  {{ city.name }}
+                </option>
+              {% endfor %}
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="md:col-span-4 flex justify-end gap-3 pt-2">
           <a href="{% url 'users:find_service' %}"
              class="inline-flex items-center justify-center px-5 py-3 rounded-xl border border-slate-300 bg-white
                     text-slate-800 font-semibold hover:bg-slate-50 transition">
@@ -148,20 +173,14 @@
   </div>
 </div>
 
-{# ✅ Provide URLs to JS cleanly #}
 <script>
   window.TRADES_SEARCH_API_URL = "{% url 'users:api_find_service' %}";
-  // Base should end with a trailing slash.
-  // If your profile URL is like /users/profile/<id>/ then use that base.
   window.TRADES_PROFILE_BASE_URL = "/profile/";
 </script>
 
 <script src="{% static 'users/js/find_service_filters.js' %}"></script>
 {% endblock %}
 
-
 {% block scripts %}
   <script src="{% static 'users/js/find_service.js' %}"></script>
 {% endblock scripts %}
-
-
