@@ -126,10 +126,10 @@
                            focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400">
               <option value="">All cities</option>
               {% for city in cities %}
-                <option value="{{ city.name }}"
+                <option value="{{ city.city }}"
                         data-province="{{ city.province }}"
-                        {% if selected_city and selected_city == city.name %}selected{% endif %}>
-                  {{ city.name }}
+                        {% if selected_city and selected_city == city.city %}selected{% endif %}>
+                  {{ city.city }}
                 </option>
               {% endfor %}
             </select>

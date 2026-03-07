@@ -337,32 +337,43 @@ def delete_service_area_confirm(request, area_id):
 
     return render(request, "users/confirm_delete_service_area.html", {"area": link})
 
-#  serach and find a service
+# search and find a service
 def find_service(request):
     categories = ServiceCategory.objects.order_by("name")
     subcategories = SubCategory.objects.select_related("category").order_by("name")
 
+    service_areas = ServiceArea.objects.filter(is_active=True).order_by("province", "city")
+
+    provinces = (
+        service_areas
+        .values_list("province", flat=True)
+        .distinct()
+        .order_by("province")
+    )
+
     cities = (
-        ServiceArea.objects.filter(is_active=True)
-        .values_list("city", flat=True)
+        service_areas
+        .values("city", "province")
         .distinct()
         .order_by("city")
     )
 
     selected_category = request.GET.get("category")
     selected_subcategory = request.GET.get("subcategory")
+    selected_province = request.GET.get("province")
     selected_city = request.GET.get("city")
 
     context = {
         "categories": categories,
         "subcategories": subcategories,
+        "provinces": provinces,
         "cities": cities,
         "selected_category": selected_category,
         "selected_subcategory": selected_subcategory,
+        "selected_province": selected_province,
         "selected_city": selected_city,
     }
     return render(request, "users/find_service.html", context)
-
 
 #  API view
 def api_find_service(request):
