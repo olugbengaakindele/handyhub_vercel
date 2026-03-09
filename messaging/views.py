@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from .forms import MessageSendForm
 from .models import Conversation, Message, Attachment
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -118,8 +119,11 @@ def api_send_message(request, conversation_id):
         within_cooldown = last_emailed_at and (now - last_emailed_at < cooldown)
 
         if is_inactive and not within_cooldown:
-            site_url = getattr(settings, "SITE_URL", "http://127.0.0.1:8000")
-            convo_link = f"{site_url}/messages/c/{convo.id}/"
+            # site_url = getattr(settings, "SITE_URL", "https://handyhub-vercel.onrender.com")
+            # convo_link = f"{site_url}/messages/c/{convo.id}/"
+            site_url = getattr(settings, "SITE_URL", "").rstrip("/")
+            convo_path = reverse("messaging:detail", kwargs={"conversation_id": convo.id})
+            convo_link = f"{site_url}{convo_path}"
 
             sender_name = request.user.get_full_name() or request.user.username
             recipient_name = recipient.get_full_name() or recipient.username
