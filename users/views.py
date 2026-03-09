@@ -375,17 +375,19 @@ def find_service(request):
     }
     return render(request, "users/find_service.html", context)
 
-#  API view
+
+# API view
 def api_find_service(request):
     category_id = (request.GET.get("category") or "").strip()
     subcategory_id = (request.GET.get("subcategory") or "").strip()
+    province = (request.GET.get("province") or "").strip()
     city = (request.GET.get("city") or "").strip()
 
     qs = (
         UserProfile.objects
-        .select_related("user")
+        .select_related("user", "user_province")
         .filter(account_type__iexact="tradesperson")
-        .filter(user__services__isnull=False)  # ✅ must have at least one service
+        .filter(user__services__isnull=False)
     )
 
     if category_id.isdigit():
@@ -394,7 +396,16 @@ def api_find_service(request):
     if subcategory_id.isdigit():
         qs = qs.filter(user__services__subcategory_id=int(subcategory_id))
 
-    # ✅ CITY FILTER — FIXED
+    # PROVINCE FILTER
+    if province:
+        qs = qs.filter(
+            Q(user_province__province_code__iexact=province) |
+            Q(user_province__name__iexact=province) |
+            Q(user__user_service_areas__service_area__province__province_code__iexact=province) |
+            Q(user__user_service_areas__service_area__province__name__iexact=province)
+        )
+
+    # CITY FILTER
     if city:
         qs = qs.filter(
             Q(user_city__iexact=city) |
