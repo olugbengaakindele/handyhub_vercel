@@ -385,7 +385,7 @@ def api_find_service(request):
 
     qs = (
         UserProfile.objects
-        .select_related("user", "user_province")
+        .select_related("user")
         .filter(account_type__iexact="tradesperson")
         .filter(user__services__isnull=False)
     )
@@ -396,16 +396,12 @@ def api_find_service(request):
     if subcategory_id.isdigit():
         qs = qs.filter(user__services__subcategory_id=int(subcategory_id))
 
-    # PROVINCE FILTER
     if province:
         qs = qs.filter(
-            Q(user_province__province_code__iexact=province) |
-            Q(user_province__name__iexact=province) |
-            Q(user__user_service_areas__service_area__province__province_code__iexact=province) |
-            Q(user__user_service_areas__service_area__province__name__iexact=province)
+            Q(user_province__iexact=province) |
+            Q(user__user_service_areas__service_area__province__iexact=province)
         )
 
-    # CITY FILTER
     if city:
         qs = qs.filter(
             Q(user_city__iexact=city) |
@@ -424,8 +420,8 @@ def api_find_service(request):
             "name": f"{p.user_firstname} {p.user_last_name}".strip(),
             "business_name": p.user_business_name or "",
             "city": p.user_city or "",
-            "province": str(getattr(p, "user_province", "") or ""),
-            "summary": getattr(p, "profile_summary", "") or "",
+            "province": p.user_province or "",
+            "summary": p.profile_summary or "",
             "image": img_url,
         })
 
