@@ -8,7 +8,6 @@
 <div class="min-h-screen bg-slate-100 py-10">
   <div class="max-w-7xl mx-auto px-4">
 
-    <!-- Top actions -->
     <div class="flex items-center justify-between gap-4 mb-6">
       <a href="{% url 'users:find_service' %}"
          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-800
@@ -23,7 +22,6 @@
       </a>
     </div>
 
-    <!-- GITHUB-STYLE LAYOUT -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
       <!-- LEFT SIDEBAR -->
@@ -45,9 +43,15 @@
               {% endif %}
 
               <div class="min-w-0 flex-1">
-                <h6 class="text-1x2 font-bold text-slate-800 leading-tight truncate">
+                <h1 class="text-2xl font-extrabold text-slate-900 leading-tight truncate">
                   {{ profile.user_business_name|default:user_obj.get_full_name }}
-                </h6>
+                </h1>
+
+                {% if profile.user_business_name %}
+                  <p class="text-sm text-slate-600 mt-1">
+                    {{ profile.user_firstname }} {{ profile.user_last_name }}
+                  </p>
+                {% endif %}
 
                 <p class="text-sm text-slate-600 mt-1">
                   {% if profile.user_city or profile.user_province %}
@@ -94,10 +98,36 @@
             {% if profile.user_primary_phone %}
               <div class="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                 <div class="min-w-0">
-                  <div class="text-[11px] font-bold text-slate-500">Phone</div>
+                  <div class="text-[11px] font-bold text-slate-500">Primary phone</div>
                   <div class="font-extrabold text-slate-900 truncate">{{ profile.user_primary_phone }}</div>
                 </div>
                 <a href="tel:{{ profile.user_primary_phone|cut:' ' }}"
+                   class="text-emerald-700 text-xs font-extrabold hover:underline">
+                  Call
+                </a>
+              </div>
+            {% endif %}
+
+            {% if profile.user_business_phone %}
+              <div class="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div class="min-w-0">
+                  <div class="text-[11px] font-bold text-slate-500">Business phone</div>
+                  <div class="font-extrabold text-slate-900 truncate">{{ profile.user_business_phone }}</div>
+                </div>
+                <a href="tel:{{ profile.user_business_phone|cut:' ' }}"
+                   class="text-emerald-700 text-xs font-extrabold hover:underline">
+                  Call
+                </a>
+              </div>
+            {% endif %}
+
+            {% if profile.user_secondary_phone %}
+              <div class="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div class="min-w-0">
+                  <div class="text-[11px] font-bold text-slate-500">Secondary phone</div>
+                  <div class="font-extrabold text-slate-900 truncate">{{ profile.user_secondary_phone }}</div>
+                </div>
+                <a href="tel:{{ profile.user_secondary_phone|cut:' ' }}"
                    class="text-emerald-700 text-xs font-extrabold hover:underline">
                   Call
                 </a>
@@ -117,82 +147,68 @@
               </div>
             {% endif %}
 
-            {% if profile.address_line1 or profile.address_line2 or profile.user_city or profile.user_province or profile.postal_code %}
+            {% if profile.user_address_line1 or profile.user_address_line2 or profile.user_city or profile.user_province or profile.user_postal_code %}
               <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                 <div class="text-[11px] font-bold text-slate-500">Address</div>
                 <div class="text-sm font-semibold text-slate-800 leading-relaxed">
-                  {% if profile.address_line1 %}{{ profile.address_line1 }}{% endif %}
-                  {% if profile.address_line2 %}, {{ profile.address_line2 }}{% endif %}
+                  {% if profile.user_address_line1 %}{{ profile.user_address_line1 }}{% endif %}
+                  {% if profile.user_address_line2 %}, {{ profile.user_address_line2 }}{% endif %}
                   <br />
                   {% if profile.user_city %}{{ profile.user_city }}{% endif %}
                   {% if profile.user_province %}{% if profile.user_city %}, {% endif %}{{ profile.user_province }}{% endif %}
-                  {% if profile.postal_code %} {{ profile.postal_code }}{% endif %}
+                  {% if profile.user_postal_code %} {{ profile.user_postal_code }}{% endif %}
                 </div>
               </div>
             {% endif %}
-          </div>
 
-          {% if profile.website_url or profile.instagram_url or profile.facebook_url or profile.twitter_url or profile.linkedin_url %}
-            <div class="mt-5">
-              <h3 class="text-xs font-extrabold text-slate-700 mb-2">Social</h3>
-              <div class="flex flex-wrap gap-2">
-                {% if profile.website_url %}
-                  <a href="{{ profile.website_url }}" target="_blank" rel="noopener"
-                     class="px-3 py-1.5 rounded-full bg-slate-900 text-white text-xs font-extrabold hover:bg-slate-800 transition">
-                    Website
-                  </a>
-                {% endif %}
-                {% if profile.instagram_url %}
-                  <a href="{{ profile.instagram_url }}" target="_blank" rel="noopener"
-                     class="px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-extrabold hover:bg-emerald-100 transition">
-                    Instagram
-                  </a>
-                {% endif %}
-                {% if profile.facebook_url %}
-                  <a href="{{ profile.facebook_url }}" target="_blank" rel="noopener"
-                     class="px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-extrabold hover:bg-emerald-100 transition">
-                    Facebook
-                  </a>
-                {% endif %}
-                {% if profile.twitter_url %}
-                  <a href="{{ profile.twitter_url }}" target="_blank" rel="noopener"
-                     class="px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-extrabold hover:bg-emerald-100 transition">
-                    X
-                  </a>
-                {% endif %}
-                {% if profile.linkedin_url %}
-                  <a href="{{ profile.linkedin_url }}" target="_blank" rel="noopener"
-                     class="px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-extrabold hover:bg-emerald-100 transition">
-                    LinkedIn
-                  </a>
-                {% endif %}
+            {% if profile.user_website %}
+              <div class="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div class="min-w-0">
+                  <div class="text-[11px] font-bold text-slate-500">Website</div>
+                  <div class="font-extrabold text-slate-900 truncate">{{ profile.user_website }}</div>
+                </div>
+                <a href="{{ profile.user_website }}" target="_blank" rel="noopener"
+                   class="text-emerald-700 text-xs font-extrabold hover:underline">
+                  Visit
+                </a>
               </div>
-            </div>
-          {% endif %}
+            {% endif %}
+          </div>
         </div>
 
-        <!-- Achievements (placeholder for future model) -->
+        <!-- Achievements -->
         <div class="bg-white rounded-3xl shadow border border-slate-200 p-6 mt-6">
           <div class="flex items-center justify-between">
             <h2 class="text-sm font-extrabold text-slate-900">Achievements</h2>
-            <span class="text-xs text-slate-500">Coming soon</span>
+            <span class="text-xs text-slate-500">{{ achievements|length }} item{{ achievements|length|pluralize }}</span>
           </div>
 
-          <div class="mt-4 grid grid-cols-3 gap-3">
-            <div class="h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-xs font-extrabold text-slate-500">
-              Badge
+          {% if achievements %}
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {% for achievement in achievements %}
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+                  <div class="flex items-start gap-3">
+                    <div class="h-10 w-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-lg">
+                      {{ achievement.icon|default:"🏆" }}
+                    </div>
+                    <div class="min-w-0">
+                      <div class="font-extrabold text-slate-900">{{ achievement.title }}</div>
+                      {% if achievement.issuer %}
+                        <div class="text-xs text-slate-500 mt-1">{{ achievement.issuer }}</div>
+                      {% endif %}
+                      {% if achievement.description %}
+                        <div class="text-sm text-slate-600 mt-2">{{ achievement.description }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
             </div>
-            <div class="h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-xs font-extrabold text-slate-500">
-              Badge
-            </div>
-            <div class="h-16 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-xs font-extrabold text-slate-500">
-              Badge
-            </div>
-          </div>
-
-          <p class="text-xs text-slate-500 mt-4">
-            You’ll be able to showcase certifications, awards, and licenses here.
-          </p>
+          {% else %}
+            <p class="text-xs text-slate-500 mt-4">
+              No achievements added yet.
+            </p>
+          {% endif %}
         </div>
 
       </aside>
@@ -200,7 +216,6 @@
       <!-- MAIN CONTENT -->
       <main class="lg:col-span-8 space-y-8">
 
-        <!-- Call-out fee (moved here - compact bar) -->
         {% if callout_settings and callout_settings.enabled and callout_settings.amount %}
           <section class="bg-white rounded-3xl shadow border border-slate-200 p-5 md:p-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -261,6 +276,71 @@
               <span class="text-slate-500">No service areas listed.</span>
             {% endfor %}
           </div>
+        </section>
+
+        <!-- Licenses -->
+        <section class="bg-white rounded-3xl shadow border border-slate-200 p-6 md:p-8">
+          <div class="flex items-center justify-between gap-4 mb-5">
+            <h2 class="text-lg font-extrabold text-slate-900">Licenses</h2>
+            <span class="text-xs text-slate-500">Credentials they’ve shared</span>
+          </div>
+
+          {% if licenses %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {% for license in licenses %}
+                <div class="rounded-2xl border border-slate-200 p-4 bg-slate-50">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="font-extrabold text-slate-900">{{ license.license_name }}</div>
+                      {% if license.issuing_authority %}
+                        <div class="text-sm text-slate-600 mt-1">{{ license.issuing_authority }}</div>
+                      {% endif %}
+                    </div>
+
+                    <span class="px-2.5 py-1 rounded-full text-xs font-bold
+                                 {% if license.status == 'active' %}
+                                   bg-emerald-50 text-emerald-700 border border-emerald-200
+                                 {% elif license.status == 'expired' %}
+                                   bg-red-50 text-red-700 border border-red-200
+                                 {% else %}
+                                   bg-amber-50 text-amber-700 border border-amber-200
+                                 {% endif %}">
+                      {{ license.get_status_display }}
+                    </span>
+                  </div>
+
+                  <div class="mt-3 space-y-1 text-sm text-slate-600">
+                    {% if license.license_number %}
+                      <div><span class="font-semibold text-slate-700">Number:</span> {{ license.license_number }}</div>
+                    {% endif %}
+                    {% if license.province %}
+                      <div><span class="font-semibold text-slate-700">Province:</span> {{ license.province.name }}</div>
+                    {% endif %}
+                    {% if license.issue_date %}
+                      <div><span class="font-semibold text-slate-700">Issued:</span> {{ license.issue_date }}</div>
+                    {% endif %}
+                    {% if license.expiry_date %}
+                      <div><span class="font-semibold text-slate-700">Expiry:</span> {{ license.expiry_date }}</div>
+                    {% endif %}
+                    {% if license.notes %}
+                      <div class="pt-1">{{ license.notes }}</div>
+                    {% endif %}
+                  </div>
+
+                  {% if license.document %}
+                    <div class="mt-3">
+                      <a href="{{ license.document.url }}" target="_blank" rel="noopener"
+                         class="text-emerald-700 text-sm font-extrabold hover:underline">
+                        View document
+                      </a>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-slate-500">No public licenses listed.</p>
+          {% endif %}
         </section>
 
         <!-- Gallery -->

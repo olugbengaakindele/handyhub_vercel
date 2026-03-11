@@ -396,3 +396,28 @@ class CallOutFeeSettings(models.Model):
         return f"Call-out fee ({self.user})"
     
 
+class Achievement(models.Model):
+    profile = models.ForeignKey(
+        "users.UserProfile",
+        on_delete=models.CASCADE,
+        related_name="achievements"
+    )
+
+    title = models.CharField(max_length=120)
+    issuer = models.CharField(max_length=120, blank=True)
+    description = models.CharField(max_length=300, blank=True)
+
+    icon = models.CharField(
+        max_length=10,
+        blank=True,
+        help_text="Optional emoji/icon like 🏆, ⭐, 🔧"
+    )
+
+    public_visibility = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title

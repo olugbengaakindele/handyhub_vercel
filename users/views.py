@@ -440,14 +440,14 @@ def profile_detail(request, user_id):
         profile__account_type="tradesperson",
     )
 
+    profile = user.profile
+
     try:
         callout_settings = user.callout_settings
     except CallOutFeeSettings.DoesNotExist:
         callout_settings = None
 
-    profile = user.profile
-
-    # Services offered by this tradesperson
+    # Services offered
     services = (
         UserService.objects
         .select_related("category", "subcategory")
@@ -455,24 +455,34 @@ def profile_detail(request, user_id):
         .order_by("category__name", "subcategory__name")
     )
 
-    # ✅ Service areas (robust way):
-    # If you have a through table like UserServiceArea, the safest is to query via that model
-    # BUT since we don't have it here, we can still make your existing query safer by:
-    # - using distinct()
-    # - not assuming ordering fields exist (metro_city/city/name)
+    # Service areas
     service_areas = (
         ServiceArea.objects
-        .filter(userservicearea__user=user, is_active=True)  # keep, but see note below
+        .filter(userservicearea__user=user, userservicearea__is_active=True, is_active=True)
         .distinct()
-        .order_by("city")  # keep simple; change if your fields differ
+        .order_by("city", "name")
     )
 
-    # ✅ Gallery (add this)
-    # Replace ProfileGalleryImage with your actual gallery model & field names.
+    # Gallery
     gallery = (
         TradeWorkPhoto.objects
-        .filter(user=user)               # or filter(profile=profile) depending on your model
-        .order_by("-created_at")[:18]    # cap to keep the page fast
+        .filter(user=user)
+        .order_by("-created_at")[:18]
+    )
+
+    # Public licenses
+    licenses = (
+        License.objects
+        .select_related("province")
+        .filter(profile=profile, public_visibility=True)
+        .order_by("-created_at")
+    )
+
+    # Public achievements
+    achievements = (
+        profile.achievements
+        .filter(public_visibility=True)
+        .order_by("-created_at")
     )
 
     context = {
@@ -481,6 +491,8 @@ def profile_detail(request, user_id):
         "services": services,
         "service_areas": service_areas,
         "gallery": gallery,
+        "licenses": licenses,
+        "achievements": achievements,
         "callout_settings": callout_settings,
     }
 
