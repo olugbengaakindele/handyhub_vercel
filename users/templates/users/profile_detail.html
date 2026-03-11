@@ -37,15 +37,15 @@
             <div class="flex items-start gap-4">
               {% if profile.user_profile_image %}
                 <button
-                  type="button"
                   id="openProfileImageModal"
-                  class="group relative block rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-300"
-                  aria-label="Open profile photo"
+                  type="button"
+                  class="cursor-pointer"
                 >
-                  <img src="{{ profile.user_profile_image.url }}"
-                       alt="Profile photo"
-                       class="h-24 w-24 rounded-2xl object-cover border border-slate-200 shadow-sm group-hover:opacity-95 transition" />
-                  <span class="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/10 transition"></span>
+                  <img
+                    src="{{ profile.user_profile_image.url }}"
+                    alt="Profile photo"
+                    class="h-24 w-24 rounded-2xl object-cover border border-slate-200 shadow-sm hover:scale-105 transition"
+                  />
                 </button>
               {% else %}
                 <div class="h-24 w-24 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 text-sm font-bold">
@@ -384,6 +384,28 @@
   </div>
 </div>
 
-{% load static %}
-<script src="{% static 'users/js/profile_detail.js' %}"></script>
+  {% load static %}
+  <script src="{% static 'users/js/profile_detail.js' %}"></script>
+
+  {% if profile.user_profile_image %}
+  <div id="profileImageModal"
+      class="fixed inset-0 hidden items-center justify-center bg-black/80 z-50">
+
+    <div class="relative">
+
+      <button id="closeProfileImageModal"
+              class="absolute -top-10 right-0 text-white text-3xl font-bold">
+        ✕
+      </button>
+
+      <img
+        src="{{ profile.user_profile_image.url }}"
+        class="max-h-[90vh] max-w-[90vw] rounded-xl shadow-xl"
+        alt="Full profile image"
+      >
+
+    </div>
+  </div>
+  {% endif %}
+
 {% endblock %}
