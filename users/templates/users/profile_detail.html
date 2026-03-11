@@ -1,4 +1,7 @@
 {% extends "./base.html" %}
+{% load static %}
+
+
 
 {% block title %}
   {{ profile.user_business_name|default:user_obj.get_full_name }} | LocalTradePros
@@ -33,9 +36,17 @@
 
             <div class="flex items-start gap-4">
               {% if profile.user_profile_image %}
-                <img src="{{ profile.user_profile_image.url }}"
-                     alt="Profile photo"
-                     class="h-24 w-24 rounded-2xl object-cover border border-slate-200 shadow-sm" />
+                <button
+                  type="button"
+                  id="openProfileImageModal"
+                  class="group relative block rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-300"
+                  aria-label="Open profile photo"
+                >
+                  <img src="{{ profile.user_profile_image.url }}"
+                       alt="Profile photo"
+                       class="h-24 w-24 rounded-2xl object-cover border border-slate-200 shadow-sm group-hover:opacity-95 transition" />
+                  <span class="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/10 transition"></span>
+                </button>
               {% else %}
                 <div class="h-24 w-24 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 text-sm font-bold">
                   No Photo
@@ -55,13 +66,17 @@
 
                 <p class="text-sm text-slate-600 mt-1">
                   {% if profile.user_city or profile.user_province %}
-                    {{ profile.user_city }}{% if profile.user_province %}, {{ profile.user_province }}{% endif %}
+                    {{ profile.user_city }}{% if profile.user_province %}, {{ profile.get_user_province_display }}{% endif %}
                   {% else %}
                     Location not provided
                   {% endif %}
                 </p>
               </div>
             </div>
+
+            {% if profile.user_profile_image %}
+              <p class="text-xs text-slate-500 mt-2">Click photo to enlarge</p>
+            {% endif %}
 
             {% if profile.profile_summary %}
               <p class="text-sm text-slate-700 leading-relaxed mt-5">
@@ -155,7 +170,7 @@
                   {% if profile.user_address_line2 %}, {{ profile.user_address_line2 }}{% endif %}
                   <br />
                   {% if profile.user_city %}{{ profile.user_city }}{% endif %}
-                  {% if profile.user_province %}{% if profile.user_city %}, {% endif %}{{ profile.user_province }}{% endif %}
+                  {% if profile.user_province %}{% if profile.user_city %}, {% endif %}{{ profile.get_user_province_display }}{% endif %}
                   {% if profile.user_postal_code %} {{ profile.user_postal_code }}{% endif %}
                 </div>
               </div>
@@ -368,4 +383,7 @@
     </div>
   </div>
 </div>
+
+{% load static %}
+<script src="{% static 'users/js/profile_detail.js' %}"></script>
 {% endblock %}
