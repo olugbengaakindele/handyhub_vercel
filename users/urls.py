@@ -99,4 +99,13 @@ urlpatterns = [
     path("account/delete/", views.delete_account, name="delete_account"),
 
     path("post-login/", views.post_login, name="post_login"),
+
+    path("edit-achievements/", views.edit_achievements, name="edit_achievements"),
+    
+    path(
+        "achievements/delete/<int:achievement_id>/",
+        views.delete_achievement_confirm,
+        name="delete_achievement_confirm",
+    ),
+    
 ]

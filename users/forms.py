@@ -393,3 +393,38 @@ class DeleteAccountForm(forms.Form):
             "autocomplete": "current-password",
         })
     )
+
+
+from .models import Achievement
+
+class AchievementForm(forms.ModelForm):
+    class Meta:
+        model = Achievement
+        fields = ["title", "issuer", "description", "icon", "public_visibility"]
+        widgets = {
+            "title": forms.TextInput(attrs={
+                "class": "w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400",
+                "placeholder": "e.g. Red Seal Certified"
+            }),
+            "issuer": forms.TextInput(attrs={
+                "class": "w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400",
+                "placeholder": "e.g. Government of Alberta"
+            }),
+            "description": forms.Textarea(attrs={
+                "class": "w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400",
+                "rows": 4,
+                "maxlength": 300,
+                "placeholder": "Brief description of this achievement"
+            }),
+            "icon": forms.TextInput(attrs={
+                "class": "w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400",
+                "placeholder": "e.g. 🏆"
+            }),
+            "public_visibility": forms.CheckboxInput(attrs={
+                "class": "h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+            }),
+        }
+
+    def clean_icon(self):
+        icon = (self.cleaned_data.get("icon") or "").strip()
+        return icon[:10]

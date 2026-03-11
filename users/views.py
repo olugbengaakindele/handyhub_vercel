@@ -764,3 +764,46 @@ def post_login(request):
         return redirect("users:edit_service_areas")
 
     return redirect("users:profile")
+
+@login_required
+def edit_achievements(request):
+    profile = request.user.profile
+
+    if request.method == "POST":
+        form = AchievementForm(request.POST)
+        if form.is_valid():
+            achievement = form.save(commit=False)
+            achievement.profile = profile
+            achievement.save()
+            messages.success(request, "Achievement added successfully.")
+            return redirect("users:edit_achievements")
+    else:
+        form = AchievementForm()
+
+    achievements = profile.achievements.all().order_by("-created_at")
+
+    context = {
+        "form": form,
+        "achievements": achievements,
+    }
+    return render(request, "users/edit_achievements.html", context)
+
+
+@login_required
+def delete_achievement_confirm(request, achievement_id):
+    achievement = get_object_or_404(
+        Achievement,
+        id=achievement_id,
+        profile=request.user.profile
+    )
+
+    if request.method == "POST":
+        achievement.delete()
+        messages.success(request, "Achievement deleted successfully.")
+        return redirect("users:edit_achievements")
+
+    return render(
+        request,
+        "users/confirm_delete_achievement.html",
+        {"achievement": achievement}
+    )

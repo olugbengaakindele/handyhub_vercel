@@ -405,15 +405,19 @@ class Achievement(models.Model):
 
     title = models.CharField(max_length=120)
     issuer = models.CharField(max_length=120, blank=True)
-    description = models.CharField(max_length=300, blank=True)
+    description = models.TextField(blank=True, max_length=300)
 
     icon = models.CharField(
         max_length=10,
         blank=True,
-        help_text="Optional emoji/icon like 🏆, ⭐, 🔧"
+        help_text="Optional emoji like 🏆, ⭐, 🔧"
     )
 
-    public_visibility = models.BooleanField(default=True)
+    public_visibility = models.BooleanField(
+        default=True,
+        help_text="Show this achievement on your public profile"
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
