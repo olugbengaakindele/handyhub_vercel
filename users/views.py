@@ -446,7 +446,7 @@ def api_find_service(request):
 
 # user profile detail shown to public
 def profile_detail(request, user_id):
-    from .analytics import increment_profile_metric
+    from .utils import increment_profile_metric
     
 
     """
