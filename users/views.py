@@ -446,8 +446,8 @@ def api_find_service(request):
 
 # user profile detail shown to public
 def profile_detail(request, user_id):
-    from .utils import increment_profile_metric
-    increment_profile_metric(profile, "profile_views")
+    from .analytics import increment_profile_metric
+    
 
     """
     Public tradesperson profile page.
@@ -461,7 +461,7 @@ def profile_detail(request, user_id):
     )
 
     profile = user.profile
-
+    increment_profile_metric(profile, "profile_views")
     try:
         callout_settings = user.callout_settings
     except CallOutFeeSettings.DoesNotExist:
