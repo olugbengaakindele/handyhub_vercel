@@ -1,13 +1,15 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from services.models import SubCategory, ServiceCategory
-import uuid
-import os
+import uuid, os
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from .utils import get_gallery_max_upload_bytes
 from django.utils import timezone
 from django.templatetags.static import static
+from django.conf import settings
+from django.utils import timezone
+
 
 User = get_user_model()
 
@@ -425,3 +427,63 @@ class Achievement(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# this will be used for data analytics
+class ProfileDailyAnalytics(models.Model):
+    profile = models.ForeignKey(
+        "users.UserProfile",
+        on_delete=models.CASCADE,
+        related_name="daily_analytics"
+    )
+    date = models.DateField(default=timezone.localdate)
+
+    profile_views = models.PositiveIntegerField(default=0)
+    message_clicks = models.PositiveIntegerField(default=0)
+    phone_clicks = models.PositiveIntegerField(default=0)
+    email_clicks = models.PositiveIntegerField(default=0)
+    website_clicks = models.PositiveIntegerField(default=0)
+    gallery_opens = models.PositiveIntegerField(default=0)
+    license_document_views = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ("profile", "date")
+        ordering = ["-date"]
+
+    def __str__(self):
+        return f"{self.profile} - {self.date}"
+
+
+class SearchAnalytics(models.Model):
+    category = models.ForeignKey(
+        "services.ServiceCategory",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
+    subcategory = models.ForeignKey(
+        "services.SubCategory",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
+
+    province = models.CharField(max_length=50, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+
+    results_count = models.PositiveIntegerField(default=0)
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Search {self.created_at:%Y-%m-%d %H:%M}"

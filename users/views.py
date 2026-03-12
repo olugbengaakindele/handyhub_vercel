@@ -20,9 +20,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.urls import reverse
 from django.contrib.auth.hashers import check_password
-
-
-
+from services.models import ServiceCategory, SubCategory
 
 User = get_user_model()
 
@@ -377,6 +375,7 @@ def find_service(request):
 
 
 # API view
+
 def api_find_service(request):
     category_id = (request.GET.get("category") or "").strip()
     subcategory_id = (request.GET.get("subcategory") or "").strip()
@@ -411,6 +410,24 @@ def api_find_service(request):
     qs = qs.distinct()
     total = qs.count()
 
+    category_obj = None
+    subcategory_obj = None
+
+    if category_id.isdigit():
+        category_obj = ServiceCategory.objects.filter(id=int(category_id)).first()
+
+    if subcategory_id.isdigit():
+        subcategory_obj = SubCategory.objects.filter(id=int(subcategory_id)).first()
+
+    SearchAnalytics.objects.create(
+        category=category_obj,
+        subcategory=subcategory_obj,
+        province=province,
+        city=city,
+        results_count=total,
+        user=request.user if request.user.is_authenticated else None,
+    )
+
     results = []
     for p in qs[:60]:
         img_url = p.user_profile_image.url if p.user_profile_image else ""
@@ -420,15 +437,18 @@ def api_find_service(request):
             "name": f"{p.user_firstname} {p.user_last_name}".strip(),
             "business_name": p.user_business_name or "",
             "city": p.user_city or "",
-            "province": p.user_province or "",
+            "province": p.get_user_province_display() if p.user_province else "",
             "summary": p.profile_summary or "",
             "image": img_url,
         })
 
-    return JsonResponse({"count": total, "results": results})
+    return JsonResponse({ "count": total, "results": results, })
 
 # user profile detail shown to public
 def profile_detail(request, user_id):
+    from .utils import increment_profile_metric
+    increment_profile_metric(profile, "profile_views")
+
     """
     Public tradesperson profile page.
     Read-only. Accessible by anyone.

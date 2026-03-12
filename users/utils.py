@@ -5,6 +5,8 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.utils import timezone
+from django.db.models import F
 
 def get_service_area_limit(user) -> int:
     profile = getattr(user, "profile", None)
@@ -64,3 +66,33 @@ def send_verification_email(request, user):
         recipient_list=[user.email],
         fail_silently=False,
     )
+
+
+
+def increment_profile_metric(profile, field_name):
+    from .models import ProfileDailyAnalytics  # import here to avoid circular import
+    valid_fields = {
+        "profile_views",
+        "message_clicks",
+        "phone_clicks",
+        "email_clicks",
+        "website_clicks",
+        "gallery_opens",
+        "license_document_views",
+    }
+
+    if field_name not in valid_fields:
+        return
+
+    today = timezone.localdate()
+
+    obj, created = ProfileDailyAnalytics.objects.get_or_create(
+        profile=profile,
+        date=today,
+        defaults={field_name: 1},
+    )
+
+    if not created:
+        ProfileDailyAnalytics.objects.filter(pk=obj.pk).update(
+            **{field_name: F(field_name) + 1}
+        )

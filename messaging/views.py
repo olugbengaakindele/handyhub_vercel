@@ -23,7 +23,14 @@ def _require_participant(conversation, user):
 
 @login_required
 def start_conversation(request, tradesman_id):
+    
+    
     tradesman = get_object_or_404(User, id=tradesman_id)
+    from users.utils import increment_profile_metric
+    tradesman_profile = getattr(tradesman, "profile", None)
+    if tradesman_profile:
+        increment_profile_metric(tradesman_profile, "message_clicks")
+
 
     if tradesman == request.user:
         # can't message yourself

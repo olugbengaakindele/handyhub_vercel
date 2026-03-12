@@ -8,6 +8,8 @@ from .models import (
     License,
     CallOutFeeSettings,
     Achievement,
+    SearchAnalytics,
+    ProfileDailyAnalytics,
 )
 
 admin.site.register(UserProfile)
@@ -16,7 +18,8 @@ admin.site.register(Province)
 admin.site.register(City)
 admin.site.register(ServiceArea)
 admin.site.register(License)
-
+admin.site.register(SearchAnalytics)
+admin.site.register(ProfileDailyAnalytics)
 
 @admin.register(CallOutFeeSettings)
 class CallOutFeeSettingsAdmin(admin.ModelAdmin):
