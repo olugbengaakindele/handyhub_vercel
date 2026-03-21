@@ -21,7 +21,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.urls import reverse
 from django.contrib.auth.hashers import check_password
 from services.models import ServiceCategory, SubCategory
-
+from analytics.utils import log_event
 User = get_user_model()
 
 # home page
@@ -100,14 +100,19 @@ def logmeout(request):
     messages.success(request,f"You have been logout of of this app")
     return redirect("users:index")
 
+# this adds user services
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
 
-# this adds services to a user
+from analytics.utils import log_event
+from .models import UserService, ServiceCategory
+
+
 @login_required
 def add_user_services(request):
-    # 🔐 Security: users can only edit their own services
-    # if request.user.id != userid:
-    #     return redirect("users:profile", request.user.id)
     user = request.user
+    max_services = 10
 
     user_services = (
         UserService.objects
@@ -121,38 +126,76 @@ def add_user_services(request):
         category_id = request.POST.get("category")
         selected_services = request.POST.getlist("services")
 
-        if not category_id or not selected_services:
-            messages.error(request, "Please select a category and at least one service.")
-            return redirect("users:profile", user.id)
+        if not category_id:
+            messages.error(request, "Please select a category.")
+            return redirect("users:add_user_services")
+
+        if not selected_services:
+            messages.error(request, "Please select at least one service.")
+            return redirect("users:add_user_services")
 
         category = get_object_or_404(ServiceCategory, id=category_id)
 
         existing_count = user.services.count()
-        remaining_slots = 10 - existing_count
+        remaining_slots = max_services - existing_count
 
         if remaining_slots <= 0:
             messages.error(
                 request,
-                "You have already added the maximum of 10 services."
+                f"You have already added the maximum of {max_services} services."
             )
-            return redirect("users:profile")
+            return redirect("users:add_user_services")
 
-        # Only allow adding up to remaining slots
         services_to_add = selected_services[:remaining_slots]
 
+        added_count = 0
+        skipped_count = 0
+
         for sub_id in services_to_add:
-            UserService.objects.get_or_create(
+            service, created = UserService.objects.get_or_create(
                 user=user,
                 category=category,
                 subcategory_id=sub_id
+            )
+
+            if created:
+                added_count += 1
+
+                log_event(
+                    user=request.user,
+                    event_type="service.added",
+                    instance=service,
+                    description=f"Added service {service.subcategory.name}",
+                    new_data={
+                        "category": service.category.name,
+                        "subcategory": service.subcategory.name,
+                    },
+                    request=request
+                )
+            else:
+                skipped_count += 1
+
+        if added_count > 0:
+            messages.success(
+                request,
+                f"{added_count} service(s) added successfully."
+            )
+
+        if skipped_count > 0:
+            messages.warning(
+                request,
+                f"{skipped_count} selected service(s) were already on your profile and were skipped."
             )
 
         if len(selected_services) > remaining_slots:
             messages.warning(
                 request,
                 f"Only {remaining_slots} service(s) were added. "
-                "Free accounts can have a maximum of 5 services."
+                f"Free accounts can have a maximum of {max_services} services."
             )
+
+        if added_count == 0 and skipped_count == 0:
+            messages.error(request, "No services were added.")
 
         return redirect("users:profile")
 
@@ -160,21 +203,55 @@ def add_user_services(request):
         "user_obj": user,
         "user_services": user_services,
         "categories": categories,
-        "max_services": 5,
+        "max_services": max_services,
         "current_count": user.services.count(),
     }
 
     return render(request, "users/userservices.html", context)
 
+
+
 @login_required
 def edit_profile(request):
-    profile = request.user.profile  # guaranteed by signal
+    profile = request.user.profile
 
     if request.method == "POST":
         form = EditProfileForm(request.POST, instance=profile)
+
         if form.is_valid():
-            form.save()
+
+            # ✅ BEFORE SAVE → capture old values
+            old_data = {
+                "business_name": profile.user_business_name,
+                "bio": profile.profile_summary,
+            }
+
+            # ✅ SAVE
+            updated_profile = form.save()
+
+            # ✅ AFTER SAVE → capture new values
+            new_data = {
+                "business_name": updated_profile.user_business_name,
+                "bio": updated_profile.profile_summary,
+            }
+
+            # ✅ LOG EVENT
+            log_event(
+                user=request.user,
+                event_type="profile.updated",
+                instance=updated_profile,
+                description="Profile updated",
+                old_data=old_data,
+                new_data=new_data,
+                request=request
+            )
+
+            messages.success(request, "Profile updated successfully.")
             return redirect("users:profile")
+
+        else:
+            messages.error(request, "Please fix the errors below.")
+
     else:
         form = EditProfileForm(instance=profile)
 
@@ -200,6 +277,18 @@ def delete_user_service(request, service_id):
         messages.success(request, "Service removed successfully.")
         return redirect("users:userservice")
 
+
+    log_event(
+    user=request.user,
+    event_type="service.deleted",
+    instance=service,
+    description="Service deleted",
+    old_data={
+        "category": service.category.name,
+        "subcategory": service.subcategory.name,
+    },
+    request=request
+)
     # Optional: if you want a confirmation page
     return render(request, "users/delete_user_service.html", {"service": service})
 
