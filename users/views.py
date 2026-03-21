@@ -210,45 +210,42 @@ def add_user_services(request):
     return render(request, "users/userservices.html", context)
 
 
-
 @login_required
 def edit_profile(request):
     profile = request.user.profile
 
     if request.method == "POST":
+        # get original DB values BEFORE binding form changes
+        original_profile = type(profile).objects.get(pk=profile.pk)
+
+        old_data = {
+            "business_name": original_profile.user_business_name,
+            "bio": original_profile.profile_summary,
+        }
+
         form = EditProfileForm(request.POST, instance=profile)
 
         if form.is_valid():
-
-            # ✅ BEFORE SAVE → capture old values
-            old_data = {
-                "business_name": profile.user_business_name,
-                "bio": profile.profile_summary,
-            }
-
-            # ✅ SAVE
             updated_profile = form.save()
 
-            # ✅ AFTER SAVE → capture new values
             new_data = {
                 "business_name": updated_profile.user_business_name,
                 "bio": updated_profile.profile_summary,
             }
 
-            # ✅ LOG EVENT
-            log_event(
-                user=request.user,
-                event_type="profile.updated",
-                instance=updated_profile,
-                description="Profile updated",
-                old_data=old_data,
-                new_data=new_data,
-                request=request
-            )
+            if old_data != new_data:
+                log_event(
+                    user=request.user,
+                    event_type="profile.updated",
+                    instance=updated_profile,
+                    description="Profile updated",
+                    old_data=old_data,
+                    new_data=new_data,
+                    request=request
+                )
 
             messages.success(request, "Profile updated successfully.")
             return redirect("users:profile")
-
         else:
             messages.error(request, "Please fix the errors below.")
 
@@ -258,7 +255,6 @@ def edit_profile(request):
     return render(request, "users/edit_profile.html", {
         "form": form
     })
-
 
 #  this is the delete confirmation view
 
