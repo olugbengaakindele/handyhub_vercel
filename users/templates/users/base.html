@@ -90,6 +90,38 @@
           {% endif %}
         </div>
 
+        <div class="flex items-center gap-3">
+          <!-- Envelope -->
+          <a href="{% url 'messaging:inbox' %}"
+            class="relative inline-flex items-center justify-center w-9 h-9 rounded-full text-slate-300 hover:text-emerald-400 hover:bg-slate-800 transition"
+            aria-label="Messages">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-16 10h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+
+            {% if unread_message_count > 0 %}
+              <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1
+                          inline-flex items-center justify-center rounded-full
+                          bg-red-500 text-white text-[10px] font-bold leading-none shadow">
+                {% if unread_message_count > 99 %}99+{% else %}{{ unread_message_count }}{% endif %}
+              </span>
+            {% endif %}
+          </a>
+
+          <!-- Username button -->
+          <button id="userMenuBtn"
+            class="flex items-center gap-2 text-slate-300 font-medium hover:text-emerald-400 transition">
+            <span>{{ user.username }}</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+
       </div>
     </div>
   </nav>
