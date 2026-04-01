@@ -11,8 +11,9 @@
 <body class="min-h-screen bg-slate-100 text-slate-980 flex flex-col">
   <!-- Demo Environment Banner -->
   <div class="w-full bg-amber-500 text-white text-center text-sm py-2 font-medium">
-      🚧 This is a TEST / DEMO application. All profiles, data, and services are fictional.
+    🚧 This is a TEST / DEMO application. All profiles, data, and services are fictional.
   </div>
+
   <!-- NAVBAR -->
   <nav class="bg-slate-900 shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,9 +26,6 @@
           </span>
           <div class="leading-tight">
             <div class="text-lg font-extrabold text-white tracking-tight">LocalTradePros</div>
-            <!-- <div class="hidden sm:block text-[11px] text-white/70">
-              Find skilled local tradespeople and home service professionals. Connect directly.
-            </div> -->
           </div>
         </a>
 
@@ -35,54 +33,69 @@
         <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
           <a href="{% url 'users:find_service' %}" class="hover:text-emerald-400 transition">Find a Service</a>
           <a href="{% url 'contact:contact_us' %}" class="hover:text-emerald-400 transition">Contact Us</a>
-          <a href="{% url 'users:about' %}" class="hover:text-emerald-400 transition">About</a>        
+          <a href="{% url 'users:about' %}" class="hover:text-emerald-400 transition">About</a>
         </div>
 
         <!-- RIGHT SIDE -->
-        <div class="relative" >
-
+        <div class="relative">
           {% if user.is_authenticated %}
-            
-            <!-- Username Button -->
-            <button id="userMenuBtn"
-              class="flex items-center gap-2 text-slate-300 font-medium hover:text-emerald-400 transition">
-              <span>{{ user.username }}</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+
+            <div class="flex items-center gap-3">
+              <!-- Envelope Icon -->
+              <a href="{% url 'messaging:inbox' %}"
+                 class="relative inline-flex items-center justify-center w-9 h-9 rounded-full text-slate-300 hover:text-emerald-400 hover:bg-slate-800 transition"
+                 aria-label="Messages"
+                 title="Messages">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-16 10h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+
+                {% if unread_message_count > 0 %}
+                  <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 inline-flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none shadow">
+                    {% if unread_message_count > 99 %}
+                      99+
+                    {% else %}
+                      {{ unread_message_count }}
+                    {% endif %}
+                  </span>
+                {% endif %}
+              </a>
+
+              <!-- Username Button -->
+              <button id="userMenuBtn"
+                class="flex items-center gap-2 text-slate-300 font-medium hover:text-emerald-400 transition">
+                <span>{{ user.username }}</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
 
             <!-- Dropdown Menu -->
-            <div id="userDropdown" class="absolute right-0 mt-2 w-44 bg-slate-800 text-slate-200 shadow-xl rounded-lg border border-slate-700 hidden">
-
-              <a href="{% url 'users:profile'  %}" class="block px-4 py-2 hover:bg-slate-700">Account</a>
-              <a href="{% url 'users:help_faq'  %}" class="block px-4 py-2 hover:bg-slate-700">Help & FAQs</a>
+            <div id="userDropdown"
+                 class="absolute right-0 mt-2 w-44 bg-slate-800 text-slate-200 shadow-xl rounded-lg border border-slate-700 hidden">
+              <a href="{% url 'users:profile' %}" class="block px-4 py-2 hover:bg-slate-700">Account</a>
+              <a href="{% url 'users:help_faq' %}" class="block px-4 py-2 hover:bg-slate-700">Help & FAQs</a>
               <a href="#" class="block px-4 py-2 hover:bg-slate-700">Support</a>
               <a href="{% url 'messaging:inbox' %}" class="block px-4 py-2 hover:bg-slate-700">Messages</a>
 
               {% if user.is_staff %}
-                <a href="{% url 'services:addcategory' %}"
-                  class="block px-4 py-2 hover:bg-slate-700">Admin</a>
-
-                <a href="{% url 'services:subcategory' %}"
-                  class="block px-4 py-2 hover:bg-slate-700">Sub Category</a>
+                <a href="{% url 'services:addcategory' %}" class="block px-4 py-2 hover:bg-slate-700">Admin</a>
+                <a href="{% url 'services:subcategory' %}" class="block px-4 py-2 hover:bg-slate-700">Sub Category</a>
               {% endif %}
 
-              <a href="{% url 'users:logout' %}"
-                class="block px-4 py-2 text-red-400 hover:bg-slate-700">Logout</a>
+              <a href="{% url 'users:logout' %}" class="block px-4 py-2 text-red-400 hover:bg-slate-700">Logout</a>
             </div>
 
           {% else %}
 
             <div class="flex items-center gap-6 text-sm font-medium">
-              <a href="{% url 'users:login' %}"
-                class="text-slate-300 hover:text-emerald-400 transition">
+              <a href="{% url 'users:login' %}" class="text-slate-300 hover:text-emerald-400 transition">
                 Sign In
               </a>
               <a href="{% url 'users:register' %}"
-                class="inline-flex items-center justify-center bg-emerald-400 text-slate-950 px-4 py-2 rounded-xl hover:bg-emerald-500 transition font-extrabold shadow shadow-emerald-500/20">
+                 class="inline-flex items-center justify-center bg-emerald-400 text-slate-950 px-4 py-2 rounded-xl hover:bg-emerald-500 transition font-extrabold shadow shadow-emerald-500/20">
                 Create Profile
               </a>
             </div>
@@ -90,149 +103,116 @@
           {% endif %}
         </div>
 
-        <div class="flex items-center gap-3">
-          <!-- Envelope -->
-          <a href="{% url 'messaging:inbox' %}"
-            class="relative inline-flex items-center justify-center w-9 h-9 rounded-full text-slate-300 hover:text-emerald-400 hover:bg-slate-800 transition"
-            aria-label="Messages">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-16 10h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-
-            {% if unread_message_count > 0 %}
-              <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1
-                          inline-flex items-center justify-center rounded-full
-                          bg-red-500 text-white text-[10px] font-bold leading-none shadow">
-                {% if unread_message_count > 99 %}99+{% else %}{{ unread_message_count }}{% endif %}
-              </span>
-            {% endif %}
-          </a>
-
-          <!-- Username button -->
-          <button id="userMenuBtn"
-            class="flex items-center gap-2 text-slate-300 font-medium hover:text-emerald-400 transition">
-            <span>{{ user.username }}</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-        </div>
-
       </div>
     </div>
   </nav>
 
+  <!-- MAIN CONTENT -->
+  <main class="flex-1">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
 
-<!-- MAIN CONTENT -->
-<main class="flex-1">
-  <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <!-- MESSAGES -->
+      {% if messages %}
+        <div class="space-y-3 mb-6">
+          {% for message in messages %}
+            <div class="rounded-2xl border px-4 py-3 text-sm shadow-sm
+              {% if message.tags == 'error' %} bg-red-50 border-red-200 text-red-800 {% endif %}
+              {% if message.tags == 'success' %} bg-emerald-50 border-emerald-200 text-emerald-900 {% endif %}
+              {% if message.tags == 'warning' %} bg-yellow-50 border-yellow-200 text-yellow-900 {% endif %}
+              {% if message.tags == 'info' %} bg-sky-50 border-sky-200 text-sky-900 {% endif %}
+            ">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
 
-    <!-- MESSAGES -->
-    {% if messages %}
-      <div class="space-y-3 mb-6">
-        {% for message in messages %}
-          <div class="rounded-2xl border px-4 py-3 text-sm shadow-sm
-            {% if message.tags == 'error' %} bg-red-50 border-red-200 text-red-800 {% endif %}
-            {% if message.tags == 'success' %} bg-emerald-50 border-emerald-200 text-emerald-900 {% endif %}
-            {% if message.tags == 'warning' %} bg-yellow-50 border-yellow-200 text-yellow-900 {% endif %}
-            {% if message.tags == 'info' %} bg-sky-50 border-sky-200 text-sky-900 {% endif %}
-          ">
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+      {% block body %}{% endblock %}
+    </div>
+  </main>
 
-    {% block body %}{% endblock %}
-  </div>
-</main>
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-200 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div class="grid md:grid-cols-3 gap-8 items-start">
 
-<!-- FOOTER -->
-<footer class="border-t border-slate-200 bg-white">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <div class="grid md:grid-cols-3 gap-8 items-start">
-
-      <div>
-        <div class="flex items-center gap-3">
-          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white font-extrabold">
-            L
-          </span>
-          <div>
-            <div class="text-base font-extrabold text-slate-900">LocalTradePros</div>
-            <div class="text-xs text-slate-500 mt-1">
-              Find skilled local tradespeople and home service professionals. Connect directly.
+        <div>
+          <div class="flex items-center gap-3">
+            <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white font-extrabold">
+              L
+            </span>
+            <div>
+              <div class="text-base font-extrabold text-slate-900">LocalTradePros</div>
+              <div class="text-xs text-slate-500 mt-1">
+                Find skilled local tradespeople and home service professionals. Connect directly.
+              </div>
             </div>
           </div>
+
+          <p class="text-xs text-slate-500 mt-4 max-w-sm">
+            LocalTradePros is a discovery platform only. We don’t verify professionals, book services, or provide guarantees.
+          </p>
         </div>
 
-        <p class="text-xs text-slate-500 mt-4 max-w-sm">
-          LocalTradePros is a discovery platform only. We don’t verify professionals, book services, or provide guarantees.
+        <div class="md:justify-self-center">
+          <h3 class="text-sm font-extrabold text-slate-900 mb-3">Explore</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a class="text-slate-600 hover:text-emerald-700" href="{% url 'users:find_service' %}">Find a Service</a></li>
+            <li><a class="text-slate-600 hover:text-emerald-700" href="{% url 'users:about' %}">About</a></li>
+            <li><a class="text-slate-600 hover:text-emerald-700" href="{% url 'contact:contact_us' %}">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="md:justify-self-end">
+          <h3 class="text-sm font-extrabold text-slate-900 mb-3">For professionals</h3>
+          <p class="text-sm text-slate-600 mb-4 max-w-sm">
+            Create a profile to showcase your services and let customers message you directly.
+          </p>
+          {% if not user.is_authenticated %}
+            <a href="{% url 'users:register' %}"
+               class="inline-flex items-center justify-center bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-extrabold hover:bg-emerald-700 transition shadow">
+              Create Profile →
+            </a>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <div class="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-slate-200 pt-6">
+        <p class="text-xs text-slate-500">
+          © {% now "Y" %} LocalTradePros. All rights reserved.
+        </p>
+        <p class="text-xs text-slate-500">
+          Built for Canada • Privacy-friendly • Direct connections
         </p>
       </div>
-
-      <div class="md:justify-self-center">
-        <h3 class="text-sm font-extrabold text-slate-900 mb-3">Explore</h3>
-        <ul class="space-y-2 text-sm">
-          <li><a class="text-slate-600 hover:text-emerald-700" href="{% url 'users:find_service' %}">Find a Service</a></li>
-          <li><a class="text-slate-600 hover:text-emerald-700" href="{% url 'users:about' %}">About</a></li>
-          <li><a class="text-slate-600 hover:text-emerald-700" href="{% url 'contact:contact_us' %}">Contact</a></li>
-        </ul>
-      </div>
-
-      <div class="md:justify-self-end">
-        <h3 class="text-sm font-extrabold text-slate-900 mb-3">For professionals</h3>
-        <p class="text-sm text-slate-600 mb-4 max-w-sm">
-          Create a profile to showcase your services and let customers message you directly.
-        </p>
-        {% if not user.is_authenticated %}
-        <a href="{% url 'users:register' %}"
-           class="inline-flex items-center justify-center bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-extrabold hover:bg-emerald-700 transition shadow">
-          Create Profile →
-        </a>
-        {% endif %}
-      </div>
-
     </div>
+  </footer>
 
-    <div class="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-slate-200 pt-6">
-      <p class="text-xs text-slate-500">
-        © {% now "Y" %} LocalTradePros. All rights reserved.
-      </p>
-      <p class="text-xs text-slate-500">
-        Built for Canada • Privacy-friendly • Direct connections
-      </p>
-    </div>
-  </div>
-</footer>
+  <!-- DROPDOWN SCRIPT -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const btn = document.getElementById("userMenuBtn");
+      const menu = document.getElementById("userDropdown");
 
-<!-- DROPDOWN SCRIPT -->
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const btn = document.getElementById('userMenuBtn');
-    const menu = document.getElementById('userDropdown');
+      if (btn && menu) {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          menu.classList.toggle("hidden");
+        });
 
-    if (btn && menu) {
-      btn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        menu.classList.toggle('hidden');
-      });
-
-      document.addEventListener('click', function (event) {
-        if (!menu.classList.contains('hidden')) {
-          if (!menu.contains(event.target) && !btn.contains(event.target)) {
-            menu.classList.add('hidden');
+        document.addEventListener("click", function (event) {
+          if (!menu.classList.contains("hidden")) {
+            if (!menu.contains(event.target) && !btn.contains(event.target)) {
+              menu.classList.add("hidden");
+            }
           }
-        }
-      });
-    }
-  });
-</script>
-{% block scripts %}
+        });
+      }
+    });
+  </script>
 
-{% endblock scripts %}
+  {% block scripts %}
+  {% endblock scripts %}
 </body>
 </html>
