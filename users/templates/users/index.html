@@ -43,11 +43,19 @@
                class="inline-flex items-center justify-center gap-2 bg-emerald-400 text-slate-950 px-7 py-3 rounded-xl font-extrabold hover:bg-emerald-500 transition shadow-lg shadow-emerald-500/20 focus:outline-none focus:ring-2 focus:ring-emerald-200">
               Start Searching →
             </a>
+            
+            {% if not user.is_authenticated %}
+              <a href="{% url 'users:register' %}"
+                class="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 px-7 py-3 rounded-xl font-semibold hover:bg-white/15 transition">
+                I’m a Pro (Create Profile)
+              </a>
+            {% else %}
+              <a href="{% url 'users:edit_profile' %}"
+                class="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 px-7 py-3 rounded-xl font-semibold hover:bg-white/15 transition">
+                Edit Profile
+              </a>
 
-            <a href="{% url 'users:register' %}"
-               class="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 px-7 py-3 rounded-xl font-semibold hover:bg-white/15 transition">
-              I’m a Pro (Create Profile)
-            </a>
+            {% endif %}
           </div>
 
           <div class="mt-5 flex flex-wrap items-center gap-3 text-xs text-white/75">
