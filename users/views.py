@@ -912,3 +912,12 @@ def delete_achievement_confirm(request, achievement_id):
         "users/confirm_delete_achievement.html",
         {"achievement": achievement}
     )
+
+
+# #####Legal section ######
+# this is the terms 
+def terms_of_service(request):
+    return render(request, "legal/terms.html")
+
+def privacy_policy(request):
+    return render(request, "legal/privacy.html")

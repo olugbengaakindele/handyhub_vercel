@@ -11,8 +11,22 @@ from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
+import re
+from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+
+from .models import UserProfile
+
+
 class UserRegisterForm(UserCreationForm):
-    email = forms.EmailField(required=True)
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            "class": "w-full rounded-xl border border-slate-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500",
+            "placeholder": "Enter your email",
+        })
+    )
 
     account_type = forms.ChoiceField(
         choices=UserProfile.ACCOUNT_TYPE_CHOICES,
@@ -21,9 +35,37 @@ class UserRegisterForm(UserCreationForm):
         required=True
     )
 
+    agree_terms = forms.BooleanField(
+        required=True,
+        label="I agree to the Terms of Service and Privacy Policy",
+        error_messages={
+            "required": "You must agree to the Terms of Service and Privacy Policy to create an account."
+        }
+    )
+
     class Meta:
         model = User
-        fields = ["username", "email", "password1", "password2", "account_type"]
+        fields = ["username", "email", "password1", "password2", "account_type", "agree_terms"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["username"].widget.attrs.update({
+            "class": "w-full rounded-xl border border-slate-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500",
+            "placeholder": "Choose a username",
+        })
+
+        self.fields["password1"].widget.attrs.update({
+            "class": "w-full rounded-xl border border-slate-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500",
+            "placeholder": "Create a password",
+        })
+
+        self.fields["password2"].widget.attrs.update({
+            "class": "w-full rounded-xl border border-slate-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500",
+            "placeholder": "Confirm your password",
+        })
+
+        self.fields["account_type"].label = "I want to join as"
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
@@ -32,8 +74,6 @@ class UserRegisterForm(UserCreationForm):
             if User.objects.filter(email__iexact=email).exists():
                 raise forms.ValidationError("A user with this email already exists.")
         return email
-
-    
 
     def clean_password2(self):
         pw1 = self.cleaned_data.get("password1")
@@ -51,30 +91,19 @@ class UserRegisterForm(UserCreationForm):
         return pw2
 
     def save(self, commit=True):
-        user = super().save(commit=commit)
+        user = super().save(commit=False)
 
+        email = self.cleaned_data.get("email", "").strip().lower()
         account_type = self.cleaned_data.get("account_type", UserProfile.TYPE_TRADESPERSON)
 
-        # ✅ profile exists because of signal, but keep get_or_create as safety
-        profile, _ = UserProfile.objects.get_or_create(user=user)
-        profile.account_type = account_type
-        profile.save()
+        user.email = email
 
-        return user
+        if commit:
+            user.save()
 
-
-    def save(self, commit=True):
-        """
-        Save user, then set account_type on the user's profile.
-        """
-        user = super().save(commit=commit)
-
-        account_type = self.cleaned_data.get("account_type", UserProfile.TYPE_TRADESPERSON)
-
-        # ✅ Ensure profile exists (in case signals didn't create it)
-        profile, _ = UserProfile.objects.get_or_create(user=user)
-        profile.account_type = account_type
-        profile.save()
+            profile, _ = UserProfile.objects.get_or_create(user=user)
+            profile.account_type = account_type
+            profile.save()
 
         return user
 

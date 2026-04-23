@@ -107,5 +107,8 @@ urlpatterns = [
         views.delete_achievement_confirm,
         name="delete_achievement_confirm",
     ),
-    
+
+    # Legal section
+    path("terms/", views.terms_of_service, name="terms"),
+    path("privacy/", views.privacy_policy, name="privacy"),
 ]
