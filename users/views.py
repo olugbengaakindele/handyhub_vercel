@@ -921,3 +921,62 @@ def terms_of_service(request):
 
 def privacy_policy(request):
     return render(request, "legal/privacy.html")
+
+
+CURRENT_TERMS_VERSION = "v1"
+CURRENT_PRIVACY_VERSION = "v1"
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        return x_forwarded_for.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR")
+
+
+def register(request):
+    # Already logged in? Redirect home
+    if request.user.is_authenticated:
+        return redirect("users:index")
+
+    form = UserRegisterForm(request.POST or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            user = form.save()
+
+            # keep user inactive until email verification
+            user.is_active = False
+            user.save(update_fields=["is_active"])
+
+            ip_address = get_client_ip(request)
+            user_agent = request.META.get("HTTP_USER_AGENT", "")
+
+            # Save proof of legal acceptance
+            LegalAcceptance.objects.create(
+                user=user,
+                document_type=LegalAcceptance.DOCUMENT_TERMS,
+                document_version=CURRENT_TERMS_VERSION,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+
+            LegalAcceptance.objects.create(
+                user=user,
+                document_type=LegalAcceptance.DOCUMENT_PRIVACY,
+                document_version=CURRENT_PRIVACY_VERSION,
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+
+            send_verification_email(request, user)
+
+            messages.success(
+                request,
+                "Account created! Please check your email and verify your account."
+            )
+            return redirect("users:verification_sent")
+
+        messages.error(request, "Please fix the errors below.")
+
+    return render(request, "users/register.html", {"form": form})

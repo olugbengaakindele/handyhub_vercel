@@ -487,3 +487,32 @@ class SearchAnalytics(models.Model):
 
     def __str__(self):
         return f"Search {self.created_at:%Y-%m-%d %H:%M}"
+    
+
+
+# Legal acceptance
+class LegalAcceptance(models.Model):
+    DOCUMENT_TERMS = "terms"
+    DOCUMENT_PRIVACY = "privacy"
+
+    DOCUMENT_CHOICES = [
+        (DOCUMENT_TERMS, "Terms of Service"),
+        (DOCUMENT_PRIVACY, "Privacy Policy"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="legal_acceptances"
+    )
+    document_type = models.CharField(max_length=20, choices=DOCUMENT_CHOICES)
+    document_version = models.CharField(max_length=20)
+    accepted_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True, default="")
+
+    class Meta:
+        ordering = ["-accepted_at"]
+
+    def __str__(self):
+        return f"{self.user} - {self.document_type} - {self.document_version}"
