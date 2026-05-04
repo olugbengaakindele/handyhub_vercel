@@ -1,3 +1,5 @@
+let latestResults = [];
+
 function escapeHtml(str) {
   return String(str || "")
     .replaceAll("&", "&amp;")
@@ -54,34 +56,56 @@ function buildProfileCard(profile, profileBaseUrl) {
 function sortResults(results, sortValue) {
   const sorted = [...results];
 
-  switch (sortValue) {
-    case "name_asc":
-      sorted.sort(function (a, b) {
-        return getProfileSortName(a).localeCompare(getProfileSortName(b));
-      });
-      break;
+  if (sortValue === "name_asc") {
+    sorted.sort(function (a, b) {
+      return getProfileSortName(a).localeCompare(getProfileSortName(b));
+    });
+  }
 
-    case "name_desc":
-      sorted.sort(function (a, b) {
-        return getProfileSortName(b).localeCompare(getProfileSortName(a));
-      });
-      break;
+  if (sortValue === "name_desc") {
+    sorted.sort(function (a, b) {
+      return getProfileSortName(b).localeCompare(getProfileSortName(a));
+    });
+  }
 
-    case "oldest":
-      sorted.sort(function (a, b) {
-        return new Date(a.created_at || 0) - new Date(b.created_at || 0);
-      });
-      break;
+  if (sortValue === "oldest") {
+    sorted.sort(function (a, b) {
+      return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+    });
+  }
 
-    case "newest":
-    default:
-      sorted.sort(function (a, b) {
-        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
-      });
-      break;
+  if (sortValue === "newest") {
+    sorted.sort(function (a, b) {
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    });
   }
 
   return sorted;
+}
+
+function renderEmptyResults(resultsGrid) {
+  resultsGrid.innerHTML = `
+    <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-6 text-slate-600">
+      <div class="font-extrabold text-slate-800 mb-1">No tradespeople found</div>
+      Try removing one or more filters.
+    </div>
+  `;
+}
+
+function renderResults(resultsGrid, results, profileBaseUrl, sortSelect) {
+  const sortValue = sortSelect ? sortSelect.value : "newest";
+  const sortedResults = sortResults(results, sortValue);
+
+  if (!sortedResults.length) {
+    renderEmptyResults(resultsGrid);
+    return;
+  }
+
+  resultsGrid.innerHTML = sortedResults
+    .map(function (profile) {
+      return buildProfileCard(profile, profileBaseUrl);
+    })
+    .join("");
 }
 
 function rebuildSubcategories(categorySelect, subcategorySelect, allSubOptions, preserveSelection) {
@@ -115,7 +139,6 @@ function rebuildSubcategories(categorySelect, subcategorySelect, allSubOptions, 
     const exists = Array.from(subcategorySelect.options).some(function (option) {
       return option.value === previousValue;
     });
-
     subcategorySelect.value = exists ? previousValue : "";
   } else {
     subcategorySelect.value = "";
@@ -134,10 +157,7 @@ function rebuildCities(provinceSelect, citySelect, allCityOptions, preserveSelec
   citySelect.appendChild(defaultOption);
 
   const matchingOptions = allCityOptions.filter(function (option) {
-    if (!selectedProvince) {
-      return true;
-    }
-
+    if (!selectedProvince) return true;
     return option.dataset.province === selectedProvince;
   });
 
@@ -151,14 +171,13 @@ function rebuildCities(provinceSelect, citySelect, allCityOptions, preserveSelec
     const exists = Array.from(citySelect.options).some(function (option) {
       return option.value === previousValue;
     });
-
     citySelect.value = exists ? previousValue : "";
   } else {
     citySelect.value = "";
   }
 }
 
-function buildSearchQuery(categorySelect, subcategorySelect, provinceSelect, citySelect, sortSelect) {
+function buildSearchQuery(categorySelect, subcategorySelect, provinceSelect, citySelect) {
   const params = new URLSearchParams();
 
   if (categorySelect.value) params.set("category", categorySelect.value);
@@ -166,28 +185,7 @@ function buildSearchQuery(categorySelect, subcategorySelect, provinceSelect, cit
   if (provinceSelect.value) params.set("province", provinceSelect.value);
   if (citySelect.value) params.set("city", citySelect.value);
 
-  if (sortSelect && sortSelect.value) {
-    params.set("sort", sortSelect.value);
-  }
-
   return params.toString();
-}
-
-function renderEmptyResults(resultsGrid) {
-  resultsGrid.innerHTML = `
-    <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-6 text-slate-600">
-      <div class="font-extrabold text-slate-800 mb-1">No tradespeople found</div>
-      Try removing one or more filters.
-    </div>
-  `;
-}
-
-function renderResults(resultsGrid, results, profileBaseUrl) {
-  resultsGrid.innerHTML = results
-    .map(function (profile) {
-      return buildProfileCard(profile, profileBaseUrl);
-    })
-    .join("");
 }
 
 async function fetchAndRenderResults(config) {
@@ -204,12 +202,11 @@ async function fetchAndRenderResults(config) {
   } = config;
 
   const queryString = buildSearchQuery(
-            categorySelect,
-            subcategorySelect,
-            provinceSelect,
-            citySelect,
-            sortSelect
-          );
+    categorySelect,
+    subcategorySelect,
+    provinceSelect,
+    citySelect
+  );
 
   const url = queryString ? `${apiUrl}?${queryString}` : apiUrl;
 
@@ -226,18 +223,13 @@ async function fetchAndRenderResults(config) {
     }
 
     const data = await response.json();
-    const results = data.results || [];
-    const sortValue = sortSelect ? sortSelect.value : "newest";
-    const sortedResults = sortResults(results, sortValue);
+
+    latestResults = data.results || [];
 
     resultsMeta.textContent = `${data.count} tradesperson(s) found`;
 
-    if (!sortedResults.length) {
-      renderEmptyResults(resultsGrid);
-      return;
-    }
+    renderResults(resultsGrid, latestResults, profileBaseUrl, sortSelect);
 
-    renderResults(resultsGrid, sortedResults, profileBaseUrl);
   } catch (error) {
     console.error("Network/API error:", error);
     resultsMeta.textContent = "Network error loading results.";
@@ -270,15 +262,11 @@ function initFindServicePage() {
     return;
   }
 
-  const allSubOptions = Array.from(
-    subcategorySelect.querySelectorAll("option")
-  ).filter(function (option) {
+  const allSubOptions = Array.from(subcategorySelect.querySelectorAll("option")).filter(function (option) {
     return option.value;
   });
 
-  const allCityOptions = Array.from(
-    citySelect.querySelectorAll("option")
-  ).filter(function (option) {
+  const allCityOptions = Array.from(citySelect.querySelectorAll("option")).filter(function (option) {
     return option.value;
   });
 
@@ -319,7 +307,7 @@ function initFindServicePage() {
 
   if (sortSelect) {
     sortSelect.addEventListener("change", function () {
-      fetchAndRenderResults(config);
+      renderResults(resultsGrid, latestResults, window.TRADES_PROFILE_BASE_URL, sortSelect);
     });
   }
 }
