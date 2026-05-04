@@ -177,13 +177,17 @@ function rebuildCities(provinceSelect, citySelect, allCityOptions, preserveSelec
   }
 }
 
-function buildSearchQuery(categorySelect, subcategorySelect, provinceSelect, citySelect) {
+function buildSearchQuery(categorySelect, subcategorySelect, provinceSelect, citySelect, sortSelect) {
   const params = new URLSearchParams();
 
   if (categorySelect.value) params.set("category", categorySelect.value);
   if (subcategorySelect.value) params.set("subcategory", subcategorySelect.value);
   if (provinceSelect.value) params.set("province", provinceSelect.value);
   if (citySelect.value) params.set("city", citySelect.value);
+
+  if (sortSelect && sortSelect.value) {
+    params.set("sort", sortSelect.value);
+  }
 
   return params.toString();
 }
@@ -202,11 +206,12 @@ async function fetchAndRenderResults(config) {
   } = config;
 
   const queryString = buildSearchQuery(
-    categorySelect,
-    subcategorySelect,
-    provinceSelect,
-    citySelect
-  );
+      categorySelect,
+      subcategorySelect,
+      provinceSelect,
+      citySelect,
+      sortSelect
+    );
 
   const url = queryString ? `${apiUrl}?${queryString}` : apiUrl;
 
@@ -306,10 +311,9 @@ function initFindServicePage() {
   });
 
   if (sortSelect) {
-    sortSelect.addEventListener("change", function () {
-      renderResults(resultsGrid, latestResults, window.TRADES_PROFILE_BASE_URL, sortSelect);
-    });
-  }
+  sortSelect.addEventListener("change", function () {
+    fetchAndRenderResults(config);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", initFindServicePage);

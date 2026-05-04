@@ -11,7 +11,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.forms import AuthenticationForm
 from .utils import get_service_area_limit, get_gallery_photo_limit
 from django.db import transaction
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, Prefetch, Q, Value
 from django.templatetags.static import static
 from django.contrib import messages
 from .utils import send_verification_email
@@ -22,6 +22,12 @@ from django.urls import reverse
 from django.contrib.auth.hashers import check_password
 from services.models import ServiceCategory, SubCategory
 from analytics.utils import log_event
+from django.db.models.functions import Coalesce, Concat
+
+
+
+
+
 User = get_user_model()
 
 # home page
@@ -496,9 +502,9 @@ def api_find_service(request):
     qs = qs.distinct()
 
     if sort == "name_asc":
-        qs = qs.order_by("user_firstname", "user_last_name", "user_business_name", "user__username")
+        qs = qs.order_by("display_name")
     elif sort == "name_desc":
-        qs = qs.order_by("-user_firstname", "-user_last_name", "-user_business_name", "-user__username")
+        qs = qs.order_by("-display_name")
     elif sort == "oldest":
         qs = qs.order_by("user__date_joined")
     else:
