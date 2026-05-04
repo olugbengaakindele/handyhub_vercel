@@ -518,18 +518,21 @@ def api_find_service(request):
         img_url = p.user_profile_image.url if p.user_profile_image else ""
 
         results.append({
-            "profile_id": p.user_id,
-            "name": (
-                        f"{p.user_firstname} {p.user_last_name}".strip()
-                        or p.user_business_name
-                        or p.user.username
-                    ),
+           "profile_id": p.user_id,
+           "name": (
+                f"{p.user_firstname} {p.user_last_name}".strip()
+                or p.user_business_name
+                or p.user.username
+                or "Tradesperson"
+            ),
+            "username": p.user.username,
+            "created_at": p.user.date_joined.isoformat(),
             "business_name": p.user_business_name or "",
             "city": p.user_city or "",
             "province": p.get_user_province_display() if p.user_province else "",
             "summary": p.profile_summary or "",
             "image": img_url,
-            "created_at": p.user.date_joined.isoformat(),
+             
         })
 
     return JsonResponse({ "count": total, "results": results, })
