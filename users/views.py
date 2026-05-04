@@ -519,7 +519,11 @@ def api_find_service(request):
 
         results.append({
             "profile_id": p.user_id,
-            "name": f"{p.user_firstname} {p.user_last_name}".strip(),
+            "name": (
+                        f"{p.user_firstname} {p.user_last_name}".strip()
+                        or p.user_business_name
+                        or p.user.username
+                    ),
             "business_name": p.user_business_name or "",
             "city": p.user_city or "",
             "province": p.get_user_province_display() if p.user_province else "",
