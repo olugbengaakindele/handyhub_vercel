@@ -466,6 +466,7 @@ def api_find_service(request):
     subcategory_id = (request.GET.get("subcategory") or "").strip()
     province = (request.GET.get("province") or "").strip()
     city = (request.GET.get("city") or "").strip()
+    sort = (request.GET.get("sort") or "newest").strip()
 
     qs = (
         UserProfile.objects
@@ -493,6 +494,16 @@ def api_find_service(request):
         )
 
     qs = qs.distinct()
+
+    if sort == "name_asc":
+        qs = qs.order_by("user_firstname", "user_last_name", "user_business_name", "user__username")
+    elif sort == "name_desc":
+        qs = qs.order_by("-user_firstname", "-user_last_name", "-user_business_name", "-user__username")
+    elif sort == "oldest":
+        qs = qs.order_by("user__date_joined")
+    else:
+        qs = qs.order_by("-user__date_joined")
+
     total = qs.count()
 
     category_obj = None
@@ -514,28 +525,33 @@ def api_find_service(request):
     )
 
     results = []
+
     for p in qs[:60]:
         img_url = p.user_profile_image.url if p.user_profile_image else ""
 
+        display_name = (
+            f"{p.user_firstname} {p.user_last_name}".strip()
+            or p.user_business_name
+            or p.user.username
+            or "Tradesperson"
+        )
+
         results.append({
-           "profile_id": p.user_id,
-           "name": (
-                f"{p.user_firstname} {p.user_last_name}".strip()
-                or p.user_business_name
-                or p.user.username
-                or "Tradesperson"
-            ),
+            "profile_id": p.user_id,
+            "name": display_name,
             "username": p.user.username,
-            "created_at": p.user.date_joined.isoformat(),
             "business_name": p.user_business_name or "",
             "city": p.user_city or "",
             "province": p.get_user_province_display() if p.user_province else "",
             "summary": p.profile_summary or "",
             "image": img_url,
-             
+            "created_at": p.user.date_joined.isoformat(),
         })
 
-    return JsonResponse({ "count": total, "results": results, })
+    return JsonResponse({
+        "count": total,
+        "results": results,
+    })
 
 # user profile detail shown to public
 def profile_detail(request, user_id):
