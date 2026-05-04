@@ -525,6 +525,7 @@ def api_find_service(request):
             "province": p.get_user_province_display() if p.user_province else "",
             "summary": p.profile_summary or "",
             "image": img_url,
+            "created_at": p.user.date_joined.isoformat(),
         })
 
     return JsonResponse({ "count": total, "results": results, })

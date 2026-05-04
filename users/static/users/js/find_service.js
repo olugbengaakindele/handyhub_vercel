@@ -36,6 +36,39 @@ function buildProfileCard(profile, profileBaseUrl) {
   `;
 }
 
+function sortResults(results, sortValue) {
+  const sorted = [...results];
+
+  switch (sortValue) {
+    case "name_asc":
+      sorted.sort(function (a, b) {
+        return (a.name || "").localeCompare(b.name || "");
+      });
+      break;
+
+    case "name_desc":
+      sorted.sort(function (a, b) {
+        return (b.name || "").localeCompare(a.name || "");
+      });
+      break;
+
+    case "oldest":
+      sorted.sort(function (a, b) {
+        return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+      });
+      break;
+
+    case "newest":
+    default:
+      sorted.sort(function (a, b) {
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      });
+      break;
+  }
+
+  return sorted;
+}
+
 function rebuildSubcategories(categorySelect, subcategorySelect, allSubOptions, preserveSelection) {
   const selectedCategory = categorySelect.value;
   const previousValue = subcategorySelect.value;
@@ -110,21 +143,10 @@ function rebuildCities(provinceSelect, citySelect, allCityOptions, preserveSelec
 function buildSearchQuery(categorySelect, subcategorySelect, provinceSelect, citySelect) {
   const params = new URLSearchParams();
 
-  if (categorySelect.value) {
-    params.set("category", categorySelect.value);
-  }
-
-  if (subcategorySelect.value) {
-    params.set("subcategory", subcategorySelect.value);
-  }
-
-  if (provinceSelect.value) {
-    params.set("province", provinceSelect.value);
-  }
-
-  if (citySelect.value) {
-    params.set("city", citySelect.value);
-  }
+  if (categorySelect.value) params.set("category", categorySelect.value);
+  if (subcategorySelect.value) params.set("subcategory", subcategorySelect.value);
+  if (provinceSelect.value) params.set("province", provinceSelect.value);
+  if (citySelect.value) params.set("city", citySelect.value);
 
   return params.toString();
 }
@@ -137,6 +159,7 @@ async function fetchAndRenderResults(config) {
     subcategorySelect,
     provinceSelect,
     citySelect,
+    sortSelect,
     resultsMeta,
     resultsGrid,
   } = config;
@@ -163,9 +186,12 @@ async function fetchAndRenderResults(config) {
     }
 
     const data = await response.json();
+    const results = data.results || [];
+    const sortedResults = sortResults(results, sortSelect ? sortSelect.value : "newest");
+
     resultsMeta.textContent = `${data.count} tradesperson(s) found`;
 
-    if (!data.results || !data.results.length) {
+    if (!sortedResults.length) {
       resultsGrid.innerHTML = `
         <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-6 text-slate-600">
           <div class="font-extrabold text-slate-800 mb-1">No tradespeople found</div>
@@ -175,7 +201,7 @@ async function fetchAndRenderResults(config) {
       return;
     }
 
-    resultsGrid.innerHTML = data.results
+    resultsGrid.innerHTML = sortedResults
       .map(function (profile) {
         return buildProfileCard(profile, profileBaseUrl);
       })
@@ -191,6 +217,7 @@ function initFindServicePage() {
   const subcategorySelect = document.getElementById("subcategorySelect");
   const provinceSelect = document.getElementById("provinceSelect");
   const citySelect = document.getElementById("citySelect");
+  const sortSelect = document.getElementById("sortSelect");
   const resultsMeta = document.getElementById("resultsMeta");
   const resultsGrid = document.getElementById("resultsGrid");
 
@@ -226,6 +253,7 @@ function initFindServicePage() {
     subcategorySelect,
     provinceSelect,
     citySelect,
+    sortSelect,
     resultsMeta,
     resultsGrid,
   };
@@ -251,6 +279,12 @@ function initFindServicePage() {
   citySelect.addEventListener("change", function () {
     fetchAndRenderResults(config);
   });
+
+  if (sortSelect) {
+    sortSelect.addEventListener("change", function () {
+      fetchAndRenderResults(config);
+    });
+  }
 }
 
 document.addEventListener("DOMContentLoaded", initFindServicePage);
