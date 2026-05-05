@@ -311,9 +311,10 @@ function initFindServicePage() {
   });
 
   if (sortSelect) {
-  sortSelect.addEventListener("change", function () {
-    fetchAndRenderResults(config);
-  });
+    sortSelect.addEventListener("change", function () {
+      fetchAndRenderResults(config);
+    });
+  }
 }
 
 document.addEventListener("DOMContentLoaded", initFindServicePage);

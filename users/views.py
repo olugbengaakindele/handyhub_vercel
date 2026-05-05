@@ -466,7 +466,6 @@ def find_service(request):
 
 
 # API view
-
 def api_find_service(request):
     category_id = (request.GET.get("category") or "").strip()
     subcategory_id = (request.GET.get("subcategory") or "").strip()
@@ -499,7 +498,19 @@ def api_find_service(request):
             Q(user__user_service_areas__service_area__city__iexact=city)
         )
 
-    qs = qs.distinct()
+    qs = qs.annotate(
+        full_name=Concat(
+            "user_firstname",
+            Value(" "),
+            "user_last_name"
+        )
+    ).annotate(
+        display_name=Coalesce(
+            "full_name",
+            "user_business_name",
+            "user__username"
+        )
+    ).distinct()
 
     if sort == "name_asc":
         qs = qs.order_by("display_name")
@@ -544,12 +555,7 @@ def api_find_service(request):
 
         results.append({
             "profile_id": p.user_id,
-            "name": (
-                f"{p.user_firstname} {p.user_last_name}".strip()
-                or p.user_business_name
-                or p.user.username
-                or "Tradesperson"
-            ),
+            "name": display_name,
             "username": p.user.username,
             "created_at": p.user.date_joined.isoformat(),
             "business_name": p.user_business_name or "",
@@ -557,7 +563,6 @@ def api_find_service(request):
             "province": p.get_user_province_display() if p.user_province else "",
             "summary": p.profile_summary or "",
             "image": img_url,
-            
         })
 
     return JsonResponse({
