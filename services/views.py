@@ -6,7 +6,11 @@ from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404
+import json
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+
+from services.utils.service_keywords import suggest_service_from_text
 
 # Decorator to allow only staff users
 def staff_required(user):
@@ -59,3 +63,31 @@ def get_subcategories_by_category(request):
         )
 
     return JsonResponse({"subcategories": subcategories})
+
+
+@require_POST
+def api_suggest_service(request):
+    try:
+        data = json.loads(request.body)
+        problem = data.get("problem", "").strip()
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "error": "Invalid request."}, status=400)
+
+    if not problem:
+        return JsonResponse({
+            "success": False,
+            "error": "Please describe the problem."
+        }, status=400)
+
+    suggestion = suggest_service_from_text(problem)
+
+    if not suggestion:
+        return JsonResponse({
+            "success": False,
+            "message": "No matching service found."
+        })
+
+    return JsonResponse({
+        "success": True,
+        "suggestion": suggestion
+    })
