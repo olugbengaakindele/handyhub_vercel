@@ -1,22 +1,3 @@
-function getCookie(name) {
-  let cookieValue = null;
-
-  if (document.cookie && document.cookie !== "") {
-    const cookies = document.cookie.split(";");
-
-    for (let cookie of cookies) {
-      cookie = cookie.trim();
-
-      if (cookie.substring(0, name.length + 1) === name + "=") {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-
-  return cookieValue;
-}
-
 class TradesSearch {
   constructor({ apiUrl, profileBaseUrl }) {
     this.apiUrl = apiUrl;
@@ -26,7 +7,7 @@ class TradesSearch {
     this.subcategory = document.getElementById("subcategorySelect");
     this.province = document.getElementById("provinceSelect");
     this.city = document.getElementById("citySelect");
-    this.sort = document.getElementById("sortSelect");
+    this.sort = document.getElementById("sortSelect"); // ✅ NEW
 
     this.meta = document.getElementById("resultsMeta");
     this.grid = document.getElementById("resultsGrid");
@@ -43,8 +24,14 @@ class TradesSearch {
       return;
     }
 
+    this.defaultSubOption =
+      this.subcategory.querySelector("option[value='']") || null;
+
     this.allSubOptions = Array.from(this.subcategory.querySelectorAll("option"))
       .filter((opt) => opt.value);
+
+    this.defaultCityOption =
+      this.city.querySelector("option[value='']") || null;
 
     this.allCityOptions = Array.from(this.city.querySelectorAll("option"))
       .filter((opt) => opt.value);
@@ -52,6 +39,7 @@ class TradesSearch {
     this.bind();
     this.filterSubcategories({ preserveSelection: true });
     this.filterCities({ preserveSelection: true });
+
     this.fetchAndRender();
   }
 
@@ -70,6 +58,7 @@ class TradesSearch {
 
     this.city.addEventListener("change", () => this.fetchAndRender());
 
+    // ✅ SORT EVENT
     if (this.sort) {
       this.sort.addEventListener("change", () => this.fetchAndRender());
     }
@@ -135,6 +124,7 @@ class TradesSearch {
     if (this.province.value) params.set("province", this.province.value);
     if (this.city.value) params.set("city", this.city.value);
 
+    // ✅ INCLUDE SORT
     if (this.sort && this.sort.value) {
       params.set("sort", this.sort.value);
     }
@@ -176,7 +166,8 @@ class TradesSearch {
   }
 
   cardHtml(p) {
-    const name = p.name || p.business_name || p.username || "Tradesperson";
+    const name =
+      p.name || p.business_name || p.username || "Tradesperson";
 
     const img = p.image
       ? `<img src="${p.image}" class="w-12 h-12 rounded-full object-cover" />`
@@ -198,111 +189,9 @@ class TradesSearch {
   }
 }
 
-class ServiceSuggestion {
-  constructor() {
-    this.input = document.getElementById("problemInput");
-    this.button = document.getElementById("suggestServiceBtn");
-    this.resultBox = document.getElementById("suggestionResult");
-
-    if (!this.input || !this.button || !this.resultBox) {
-      console.warn("ServiceSuggestion: missing DOM elements.");
-      return;
-    }
-
-    this.bind();
-  }
-
-  bind() {
-    this.button.addEventListener("click", () => this.suggest());
-  }
-
-  async suggest() {
-    const problem = this.input.value.trim();
-
-    this.resultBox.classList.remove("hidden");
-    this.resultBox.innerHTML = "";
-
-    if (!problem) {
-      this.resultBox.innerHTML = `
-        <div class="rounded-xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
-          Please describe the problem first.
-        </div>
-      `;
-      return;
-    }
-
-    if (!window.SERVICE_SUGGESTION_API_URL) {
-      this.resultBox.innerHTML = `
-        <div class="rounded-xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
-          Suggestion API URL is missing.
-        </div>
-      `;
-      return;
-    }
-
-    this.button.disabled = true;
-    this.button.innerText = "Checking...";
-
-    try {
-      const response = await fetch(window.SERVICE_SUGGESTION_API_URL, {
-        method: "POST",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": getCookie("csrftoken"),
-        },
-        body: JSON.stringify({ problem: problem }),
-      });
-
-      const data = await response.json();
-
-      if (!data.success) {
-        this.resultBox.innerHTML = `
-          <div class="rounded-xl bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 text-sm">
-            ${data.message || data.error || "No matching service found."}
-          </div>
-        `;
-        return;
-      }
-
-      const suggestion = data.suggestion;
-
-      this.resultBox.innerHTML = `
-        <div class="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-4">
-          <p class="text-sm text-slate-700 mb-2">Suggested service:</p>
-
-          <p class="font-bold text-emerald-800">
-            ${suggestion.category_name} → ${suggestion.subcategory_name}
-          </p>
-
-          <a
-            href="/find-service/?category=${suggestion.category_id}&subcategory=${suggestion.subcategory_id}"
-            class="inline-flex mt-3 rounded-xl bg-emerald-600 px-4 py-2 text-white text-sm font-semibold hover:bg-emerald-700 transition"
-          >
-            Search this service
-          </a>
-        </div>
-      `;
-    } catch (error) {
-      console.error("Suggestion error:", error);
-
-      this.resultBox.innerHTML = `
-        <div class="rounded-xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
-          Something went wrong. Please try again.
-        </div>
-      `;
-    } finally {
-      this.button.disabled = false;
-      this.button.innerText = "Suggest Service";
-    }
-  }
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   new TradesSearch({
     apiUrl: window.TRADES_SEARCH_API_URL,
     profileBaseUrl: window.TRADES_PROFILE_BASE_URL,
   });
-
-  new ServiceSuggestion();
 });

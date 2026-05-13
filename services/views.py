@@ -9,8 +9,9 @@ from django.shortcuts import get_object_or_404
 import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-
 from services.utils.service_keywords import suggest_service_from_text
+
+
 
 # Decorator to allow only staff users
 def staff_required(user):

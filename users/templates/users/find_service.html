@@ -240,10 +240,9 @@
 <script>
   window.TRADES_SEARCH_API_URL = "{% url 'users:api_find_service' %}";
   window.TRADES_PROFILE_BASE_URL = "/profile/";
-  window.SERVICE_SUGGESTION_API_URL = "{% url 'users:api_suggest_service' %}";
+  window.SERVICE_SUGGESTION_API_URL = "{% url 'services:api_suggest_service' %}";
 </script>
 
-<script src="{% static 'users/js/find_service_filters.js' %}"></script>
-<script src="{% static 'users/js/find_service_filters.js' %}"></script>
+<script src="{% static 'users/js/find_service_filters.js' %}?v=10"></script>
 
 {% endblock %}
