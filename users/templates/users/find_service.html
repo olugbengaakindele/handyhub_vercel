@@ -184,6 +184,43 @@
     </div>
 
   </div>
+   <!-- Smart Service Suggestion Card -->
+    <section class="bg-white rounded-2xl shadow border border-slate-200 p-6 md:p-8">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-5">
+        <div>
+          <h2 class="text-xl font-extrabold text-slate-900">
+            Not sure what service you need?
+          </h2>
+          <p class="text-sm text-slate-600 mt-1 max-w-2xl">
+            Describe the issue in your own words and we’ll suggest the closest service category.
+          </p>
+        </div>
+
+        <span class="inline-flex w-fit items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
+          Smart Search
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">
+        <input
+          type="text"
+          id="problemInput"
+          placeholder="Example: My kitchen sink is leaking"
+          class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900
+                 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400"
+        >
+
+        <button
+          type="button"
+          id="suggestServiceBtn"
+          class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-white text-sm font-bold
+                 hover:bg-slate-800 transition shadow focus:outline-none focus:ring-2 focus:ring-slate-300">
+          Suggest Service
+        </button>
+      </div>
+
+      <div id="suggestionResult" class="mt-4 hidden"></div>
+    </section>
 
   <!-- Results Meta -->
   <div id="resultsMeta" class="text-sm font-semibold text-slate-600 mb-4">
@@ -203,7 +240,10 @@
 <script>
   window.TRADES_SEARCH_API_URL = "{% url 'users:api_find_service' %}";
   window.TRADES_PROFILE_BASE_URL = "/profile/";
+  window.SERVICE_SUGGESTION_API_URL = "{% url 'users:api_suggest_service' %}";
 </script>
 
 <script src="{% static 'users/js/find_service_filters.js' %}"></script>
+<script src="{% static 'users/js/find_service_filters.js' %}"></script>
+
 {% endblock %}
