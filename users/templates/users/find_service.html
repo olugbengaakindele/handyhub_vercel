@@ -30,44 +30,6 @@
       </div>
     </section>
 
-    <!-- Smart Service Suggestion Card -->
-    <section class="bg-white rounded-2xl shadow border border-slate-200 p-6 md:p-8">
-      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-5">
-        <div>
-          <h2 class="text-xl font-extrabold text-slate-900">
-            Not sure what service you need?
-          </h2>
-          <p class="text-sm text-slate-600 mt-1 max-w-2xl">
-            Describe the issue in your own words and we’ll suggest the closest service category.
-          </p>
-        </div>
-
-        <span class="inline-flex w-fit items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
-          Smart Search
-        </span>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">
-        <input
-          type="text"
-          id="problemInput"
-          placeholder="Example: My kitchen sink is leaking"
-          class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900
-                 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400"
-        >
-
-        <button
-          type="button"
-          id="suggestServiceBtn"
-          class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-white text-sm font-bold
-                 hover:bg-slate-800 transition shadow focus:outline-none focus:ring-2 focus:ring-slate-300">
-          Suggest Service
-        </button>
-      </div>
-
-      <div id="suggestionResult" class="mt-4 hidden"></div>
-    </section>
-
     <!-- Filters Card -->
     <section class="bg-white rounded-2xl shadow border border-slate-200 p-6 md:p-8">
       <div class="flex items-center justify-between gap-4 mb-6">
@@ -197,39 +159,43 @@
     </section>
 
     <!-- Results Header -->
-    <section class="bg-white rounded-2xl shadow border border-slate-200 p-6 md:p-8">
+<section class="bg-white rounded-2xl shadow border border-slate-200 p-6 md:p-8">
 
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
 
-        <h3 class="text-lg font-extrabold text-slate-900">
-          Available tradespeople
-        </h3>
+    <!-- Left: Title -->
+    <h3 class="text-lg font-extrabold text-slate-900">
+      Available tradespeople
+    </h3>
 
-        <div class="flex items-center gap-2">
-          <label for="sortSelect" class="text-sm font-medium text-slate-600">
-            Sort by:
-          </label>
+    <!-- Right: Sort -->
+    <div class="flex items-center gap-2">
+      <label for="sortSelect" class="text-sm font-medium text-slate-600">
+        Sort by:
+      </label>
 
-          <select id="sortSelect"
-            class="border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500">
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="name_asc">Name (A–Z)</option>
-            <option value="name_desc">Name (Z–A)</option>
-          </select>
-        </div>
+      <select id="sortSelect"
+        class="border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500">
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+        <option value="name_asc">Name (A–Z)</option>
+        <option value="name_desc">Name (Z–A)</option>
+      </select>
+    </div>
 
-      </div>
+  </div>
 
-      <div id="resultsMeta" class="text-sm font-semibold text-slate-600 mb-4">
-        Ready
-      </div>
+  <!-- Results Meta -->
+  <div id="resultsMeta" class="text-sm font-semibold text-slate-600 mb-4">
+    Ready
+  </div>
 
-      <div id="resultsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- JS injects cards here -->
-      </div>
+  <!-- Results Grid -->
+  <div id="resultsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- JS injects cards here -->
+  </div>
 
-    </section>
+</section>
 
   </div>
 </div>
@@ -237,9 +203,7 @@
 <script>
   window.TRADES_SEARCH_API_URL = "{% url 'users:api_find_service' %}";
   window.TRADES_PROFILE_BASE_URL = "/profile/";
-  window.SERVICE_SUGGESTION_API_URL = "{% url 'users:api_suggest_service' %}";
 </script>
 
 <script src="{% static 'users/js/find_service_filters.js' %}"></script>
-<script src="{% static 'users/js/service_suggestion.js' %}"></script>
 {% endblock %}
