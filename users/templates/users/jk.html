@@ -1,0 +1,74 @@
+{% extends "./base.html" %}
+
+{% block body %}
+
+<div class="min-h-screen bg-gray-100 flex items-center justify-center px-6">
+
+    <div class="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
+
+        <!-- Title -->
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-extrabold text-gray-800">
+                Resend Verification Email
+            </h1>
+
+            <p class="text-gray-600 mt-3 text-sm leading-relaxed">
+                Enter the email address you used during registration.
+                We will resend your verification email.
+            </p>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+            <div class="space-y-3 mb-4">
+                {% for message in messages %}
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-3">
+                        <p class="text-sm text-blue-700">
+                            {{ message }}
+                        </p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Form -->
+        <form method="POST" class="space-y-5">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-gray-700 font-medium mb-2">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    name="email"
+                    required
+                    placeholder="you@example.com"
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring focus:ring-teal-300 focus:border-teal-500"
+                >
+            </div>
+
+            <button
+                type="submit"
+                class="w-full bg-teal-500 hover:bg-teal-600 text-white font-medium py-3 rounded-xl transition"
+            >
+                Resend Verification Email
+            </button>
+        </form>
+
+        <!-- Back to Login -->
+        <div class="text-center mt-6">
+            <a
+                href="{% url 'users:login' %}"
+                class="text-sm text-blue-600 hover:underline"
+            >
+                ← Back to Login
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

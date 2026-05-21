@@ -111,4 +111,5 @@ urlpatterns = [
     # Legal section
     path("terms/", views.terms_of_service, name="terms"),
     path("privacy/", views.privacy_policy, name="privacy"),
+    path("resend-verification-email/", views.resend_verification_email, name="resend_verification_email" ),
 ]

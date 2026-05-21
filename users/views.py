@@ -23,7 +23,7 @@ from django.contrib.auth.hashers import check_password
 from services.models import ServiceCategory, SubCategory
 from analytics.utils import log_event
 from django.db.models.functions import Coalesce, Concat
-
+from .utils import send_verification_email
 
 
 
@@ -1021,3 +1021,35 @@ def register(request):
         messages.error(request, "Please fix the errors below.")
 
     return render(request, "users/register.html", {"form": form})
+
+
+def resend_verification_email(request):
+    if request.method == "POST":
+        email = request.POST.get("email", "").strip().lower()
+
+        try:
+            user = User.objects.get(email__iexact=email)
+
+            if user.is_active:
+                messages.info(
+                    request,
+                    "This account is already active. Please log in."
+                )
+                return redirect("users:login")
+
+            send_verification_email(request, user)
+
+            messages.success(
+                request,
+                "Verification email has been resent successfully."
+            )
+
+            return redirect("verification_sent")
+
+        except User.DoesNotExist:
+            messages.error(
+                request,
+                "No inactive account was found with that email."
+            )
+
+    return render(request, "users/resend_verification_email.html")
