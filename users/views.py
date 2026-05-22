@@ -1044,7 +1044,7 @@ def resend_verification_email(request):
                 "Verification email has been resent successfully."
             )
 
-            return redirect("verification_sent")
+            return redirect("user:verification_sent")
 
         except User.DoesNotExist:
             messages.error(
