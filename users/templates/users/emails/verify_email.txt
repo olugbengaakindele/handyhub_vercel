@@ -1,6 +1,6 @@
 Hi {{ user.get_full_name|default:user.username }},
 
-Welcome to HandymenHub!
+Welcome to Localtradepros!
 
 Please verify your email by clicking the link below:
 
