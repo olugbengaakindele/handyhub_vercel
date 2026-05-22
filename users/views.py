@@ -796,28 +796,46 @@ def verify_email(request, uidb64, token):
         messages.success(request, "Email verified successfully! You can now log in.")
         return redirect("users:login")  # make sure this url name exists
 
-    messages.error(request, "Verification link is invalid or expired. Please request a new one.")
+    messages.error(
+        request,
+        "This verification link is invalid or has expired. If you recently created a new account, please request a new verification email using the email address you registered with."
+    )
     return redirect("users:resend_verification")
 
 
 def resend_verification(request):
     if request.method == "POST":
-        email = (request.POST.get("email") or "").strip()
+        email = (request.POST.get("email") or "").strip().lower()
+
+        if not email:
+            messages.error(request, "Please enter the email address you used to register.")
+            return redirect("users:resend_verification")
 
         user = User.objects.filter(email__iexact=email).first()
+
         if not user:
-            messages.error(request, "No account found with that email.")
+            messages.error(
+                request,
+                "We could not find an account with that email address. If you recently created a new account, please use the email address from your latest registration."
+            )
             return redirect("users:resend_verification")
 
         if user.is_active:
-            messages.info(request, "Your email is already verified. Please log in.")
+            messages.info(
+                request,
+                "This account is already verified. Please sign in."
+            )
             return redirect("users:login")
 
         send_verification_email(request, user)
-        messages.success(request, "Verification email resent. Please check your inbox.")
+
+        messages.success(
+            request,
+            "A new verification email has been sent. Please check your inbox."
+        )
         return redirect("users:verification_sent")
 
-    return render(request, "users/resend_verification.html")
+    return render(request, "users/resend_verification_email.html")
 
 
 
