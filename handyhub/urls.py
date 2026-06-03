@@ -18,10 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from decouple import config
 
+ADMIN_URL = config("ADMIN_URL", default="secure-admin-panel/")
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+
+    path(ADMIN_URL, admin.site.urls),
     path('' , include('users.urls')),
     path('services/' , include('services.urls')),
     path("messages/", include("messaging.urls" )),
