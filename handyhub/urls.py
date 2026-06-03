@@ -34,3 +34,6 @@ if settings.DEBUG :
         settings.MEDIA_URL,
         document_root=settings.MEDIA_ROOT
     )
+
+# Custom Error Pages
+handler404 = "users.views.custom_404"
