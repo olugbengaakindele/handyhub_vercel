@@ -1075,4 +1075,4 @@ def resend_verification_email(request):
 
 # 404 page
 def custom_404(request, exception):
-    return render(request, "404.html", status=404)
+    return render(request, "user/404.html", status=404)
