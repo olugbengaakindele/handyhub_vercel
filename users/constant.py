@@ -1,6 +1,6 @@
 # users/constants.py
 SERVICE_LIMITS_BY_TIER = {
-    "free": 5,
-    "pro": 10,
+    "free": 10,
+    "pro": 30,
     "premium": None,  # unlimited
 }

@@ -113,4 +113,9 @@ urlpatterns = [
     path("privacy/", views.privacy_policy, name="privacy"),
     path("resend-verification-email/", views.resend_verification_email, name="resend_verification_email" ),
     path("verification-sent/", views.verification_sent,name="verification_sent"),
+
+    # report a profile url 
+    path("profile/<int:user_id>/report/", views.report_profile, name="report_profile"),
+
+
 ]

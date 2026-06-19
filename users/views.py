@@ -558,6 +558,8 @@ def api_find_service(request):
             "name": display_name,
             "username": p.user.username,
             "created_at": p.user.date_joined.isoformat(),
+            "email_verified": p.user.is_active,
+            "member_since": p.user.date_joined.strftime("%b %Y"),
             "business_name": p.user_business_name or "",
             "city": p.user_city or "",
             "province": p.get_user_province_display() if p.user_province else "",
@@ -1071,6 +1073,35 @@ def resend_verification_email(request):
             )
 
     return render(request, "users/resend_verification_email.html")
+
+# Report a profile view  
+@login_required
+def report_profile(request, user_id):
+    reported_user = get_object_or_404(User, id=user_id)
+
+    if reported_user == request.user:
+        messages.error(request, "You cannot report your own profile.")
+        return redirect("users:profile")
+
+    if request.method == "POST":
+        form = ProfileReportForm(request.POST)
+
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.reporter = request.user
+            report.reported_user = reported_user
+            report.save()
+
+            messages.success(request, "Thank you. This profile has been reported and will be reviewed.")
+            return redirect("users:profile")
+
+    else:
+        form = ProfileReportForm()
+
+    return render(request, "users/report_profile.html", {
+        "form": form,
+        "reported_user": reported_user,
+    })
 
 
 # 404 page

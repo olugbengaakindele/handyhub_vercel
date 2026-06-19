@@ -10,6 +10,8 @@ from .models import (
     Achievement,
     SearchAnalytics,
     ProfileDailyAnalytics,
+    ProfileReport,
+
 )
 
 admin.site.register(UserProfile)
@@ -38,3 +40,16 @@ class AchievementAdmin(admin.ModelAdmin):
         "profile__user_last_name",
         "profile__user_business_name",
     )
+
+@admin.register(ProfileReport)
+class ProfileReportAdmin(admin.ModelAdmin):
+    list_display = ("reported_user", "reporter", "reason", "status", "created_at")
+    list_filter = ("reason", "status", "created_at")
+    search_fields = (
+        "reporter__username",
+        "reporter__email",
+        "reported_user__username",
+        "reported_user__email",
+        "description",
+    )
+    readonly_fields = ("reporter", "reported_user", "reason", "description", "created_at")

@@ -516,3 +516,43 @@ class LegalAcceptance(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.document_type} - {self.document_version}"
+    
+
+# this is for reporting a profile
+class ProfileReport(models.Model):
+    REASON_CHOICES = [
+        ("spam", "Spam"),
+        ("fake_business", "Fake business"),
+        ("fraud_scam", "Fraud / Scam"),
+        ("harassment", "Harassment"),
+        ("inappropriate_content", "Inappropriate content"),
+        ("misleading_information", "Misleading information"),
+        ("other", "Other"),
+    ]
+
+    STATUS_CHOICES = [
+        ("open", "Open"),
+        ("under_review", "Under Review"),
+        ("resolved", "Resolved"),
+        ("dismissed", "Dismissed"),
+    ]
+
+    reporter = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile_reports_made"
+    )
+
+    reported_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile_reports_received"
+    )
+
+    reason = models.CharField(max_length=50, choices=REASON_CHOICES)
+    description = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.reporter.username} reported {self.reported_user.username}"

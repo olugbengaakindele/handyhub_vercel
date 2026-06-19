@@ -457,3 +457,26 @@ class AchievementForm(forms.ModelForm):
     def clean_icon(self):
         icon = (self.cleaned_data.get("icon") or "").strip()
         return icon[:10]
+
+
+# Report a profile form 
+class ProfileReportForm(forms.ModelForm):
+    class Meta:
+        model = ProfileReport
+        fields = ["reason", "description"]
+
+        widgets = {
+            "reason": forms.Select(attrs={
+                "class": "w-full rounded-lg border border-gray-300 px-3 py-2"
+            }),
+            "description": forms.Textarea(attrs={
+                "class": "w-full rounded-lg border border-gray-300 px-3 py-2",
+                "rows": 5,
+                "placeholder": "Please explain why you are reporting this profile..."
+            }),
+        }
+
+        labels = {
+            "reason": "Reason for report",
+            "description": "Details",
+        }

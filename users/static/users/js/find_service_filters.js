@@ -175,22 +175,42 @@ class TradesSearch {
     }
   }
 
-  cardHtml(p) {
+    cardHtml(p) {
     const name = p.name || p.business_name || p.username || "Tradesperson";
 
     const img = p.image
       ? `<img src="${p.image}" class="w-12 h-12 rounded-full object-cover" />`
       : `<div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xs">No Img</div>`;
 
+    const verifiedBadge = p.email_verified
+      ? `<span class="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">
+          ✓ Verified Email
+        </span>`
+      : "";
+
+    const memberSince = p.member_since
+      ? `<span class="text-xs text-gray-500">Member since ${p.member_since}</span>`
+      : "";
+
     return `
       <a href="${this.profileBaseUrl}${p.profile_id}/"
-         class="block border rounded-xl p-4 hover:shadow">
+        class="block border rounded-xl p-4 hover:shadow bg-white">
         <div class="flex gap-3">
           ${img}
-          <div>
-            <div class="font-bold">${name}</div>
-            <div class="text-sm text-gray-500">${p.business_name || ""}</div>
-            <div class="text-xs text-gray-500">${p.city || ""} ${p.province || ""}</div>
+
+          <div class="flex-1">
+            <div class="font-bold text-slate-900">${name}</div>
+
+            ${p.business_name ? `<div class="text-sm text-gray-500">${p.business_name}</div>` : ""}
+
+            <div class="mt-2 flex flex-wrap gap-2 items-center">
+              ${verifiedBadge}
+              ${memberSince}
+            </div>
+
+            <div class="mt-2 text-xs text-gray-500">
+              ${p.city || ""} ${p.province || ""}
+            </div>
           </div>
         </div>
       </a>
